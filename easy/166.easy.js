@@ -118,12 +118,25 @@ class MinHeap {
     }
 }
 const YF = (N, staff, K) => {
-    staff.sort((a, b) => b - a);
     let x = 0;
-    for (let i = 0; i < K; i++) {
-        x = x + staff[i];
+    if (N === K) {
+        for (let i = 0; i < K; i += 1) {
+            x = x + staff[i];
+        }
+    } else if (K > N / 2) {
+        const heap = new MinHeap(staff);
+        for (let i = 0; i < N - K; i += 1) {
+            heap.getMin();
+        }
+        x = heap.values.reduce((acc, v) => acc + v, 0);
+    } else {
+        const heap = new MaxHeap(staff);
+        for (let i = 0; i < K; i += 1) {
+            x = x + heap.getMax();
+        }
     }
+
     return x; // x - максимальный уровень Яндексформера
 };
 
-console.log(YF(15, [19, 20, 5, 10, 2, 20, 7, 9, 1, 3, 13, 14, 3, 3, 4], 2));
+console.log(YF(15, [19, 20, 5, 10, 2, 20, 7, 9, 1, 3, 13, 14, 3, 3, 4], 7));
