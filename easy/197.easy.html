@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; style-src 'unsafe-inline' 'self'"
+        />
+        <style>
+            div {
+                width: 180px;
+                height: 180px;
+            }
+            div {
+                position: relative;
+                background-color: transparent;
+                background-image: linear-gradient(45deg, #654430 25%, transparent 25%),
+                    linear-gradient(-45deg, #654430 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #654430 75%),
+                    linear-gradient(-45deg, transparent 75%, #654430 75%);
+                background-size: 180px 180px;
+                background-position: 0 0, 0 90px, 90px -90px, -90px 0px;
+            }
+
+            div::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-size: 90px 90px;
+                background-color: #f7ebcc;
+                background-image: radial-gradient(circle, #5f5d5e 28px, #f7ebcc 28px);
+                z-index: -2;
+            }
+            div::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-size: 90px 90px;
+                background-color: transparent;
+                background-image: radial-gradient(
+                    circle,
+                    transparent 22px,
+                    #252324 22px,
+                    #252324 25px,
+                    transparent 25px
+                );
+                z-index: -1;
+            }
+        </style>
+        <link rel="stylesheet" href="solution.css" />
+    </head>
+    <body>
+        <div></div>
+    </body>
+</html>
