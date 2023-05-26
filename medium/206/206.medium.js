@@ -4,13 +4,14 @@ const { BEEP_CODES } = require("@yandex-blitz/phone");
 
 const createApp = ({ phone }) => {
     const app = express();
+    let speeddialDict = {};
 
     // звонит по номеру записанному в "быстром наборе" под цифрой digit
     app.get("/speeddial/:digit", async (req, res) => {
         phone
             .getData()
             .then((value) => {
-                const speeddialDict = JSON.parse(value);
+                speeddialDict = { ...speeddialDict, ...JSON.parse(value) };
 
                 phone
                     .connect()
@@ -38,7 +39,7 @@ const createApp = ({ phone }) => {
         phone
             .getData()
             .then((value) => {
-                const speeddialDict = JSON.parse(value);
+                speeddialDict = { ...speeddialDict, ...JSON.parse(value) };
                 speeddialDict[req.params.digit] = Number(req.params.phonenumber);
 
                 phone
