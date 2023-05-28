@@ -3,11 +3,11 @@ module.exports = function (participants, sports) {
      * Подобно оператору new создает экземпляр объекта,
      * используя функцию-конструктор и параметры для нее
      */
-    function constructFrom(fnConstructor, ...params) {
+    function constructFrom(fnConstructor, participants, sports) {
         const res = {};
 
-        fnConstructor.bind(res).call(res, ...params);
-        Object.setPrototypeOf(res, fnConstructor);
+        fnConstructor.bind(res).call(res, participants, sports);
+        Object.setPrototypeOf(res, fnConstructor.prototype);
 
         return res;
     }
@@ -23,8 +23,9 @@ module.exports = function (participants, sports) {
         let i = sports.length;
 
         while (i--) {
+            const index = i;
             orderIndexes.push(function () {
-                return i;
+                return index;
             });
         }
 
