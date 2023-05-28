@@ -1,7 +1,7 @@
 :root {
     counter-reset: number;
 
-    /* Не помню что, но 1 свойство, вроде, удалил */
+    --box: 320px; /*3*/
 }
 
 html,
@@ -46,14 +46,14 @@ div::after {
     height: 0;
     margin: 0;
 
-    /* Вот здесь было 1 какое-то свойство */
+    content: "";
 }
 
 a {
     font-size: 16px;
     line-height: 1;
 
-    /* ??? */
+    position: relative;
 
     display: inline-block;
 
@@ -71,13 +71,13 @@ a::after {
 
     padding: 1px 2px;
 
-    /* Я в панике! Здесь было что-то про … number? */
+    content: counter(number);
 
     background: white;
 }
 
 img {
-    /* ¯\_(ツ)_/¯ */
+    height: 77px;
 
     width: 80px;
 }
