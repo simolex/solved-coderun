@@ -14,32 +14,68 @@ class MoonRoute {
     }
 }
 
-const extendTransportSystem = (classEarth, classMoon) => {
-    const ea = classEarth;
-    EarthRoute = new Proxy(ea, {
+function extendTransportSystem(classEarth, classMoon) {
+    const matherRoute = [];
+    EarthRoute = new Proxy(classEarth, {
         construct(target, args) {
-            console.log("Constract.....");
-
             return new Proxy(new target(...args), {
-                get(t, args) {
-                    console.log("fn=>", t);
-                    console.log("args=>", args);
-                    return true;
-                },
+                get(obj, prop) {
+                    if (typeof obj[prop] === "function" && prop === "transfer") {
+                        return (...argsFn) => {
+                            const result = obj[prop].apply(obj, argsFn);
+                            const transferArgs = argsFn[0];
+                            matherRoute.push({
+                                ...transferArgs,
+                                origin: transferArgs.destination,
+                                destination: "Mothership"
+                            });
+                            return result;
+                        };
+                    }
+                    return Reflect.get(obj, prop);
+                }
             });
-        },
+        }
     });
-};
+
+    MoonRoute = new Proxy(classMoon, {
+        construct(target, args) {
+            return new Proxy(new target(...args), {
+                get(obj, prop) {
+                    if (typeof obj[prop] === "function" && prop === "transfer") {
+                        return (...argsFn) => {
+                            const result = obj[prop].apply(obj, argsFn);
+                            const transferArgs = argsFn[0];
+                            matherRoute.push({
+                                ...transferArgs,
+                                origin: transferArgs.destination,
+                                destination: "Mothership"
+                            });
+                            return result;
+                        };
+                    }
+                    return Reflect.get(obj, prop);
+                }
+            });
+        }
+    });
+
+    return matherRoute;
+}
 
 const mothershipStorage = extendTransportSystem(EarthRoute, MoonRoute);
 
 const earthRoute1 = new EarthRoute();
 const moonRoute2 = new MoonRoute();
 
-earthRoute1.transfer({ content: 123 });
+earthRoute1.transfer({
+    origin: ""
+});
+earthRoute1.transfer({ content: 1232 });
+earthRoute1.transfer({ content: 1233 });
 moonRoute2.transfer({ text: "abc" });
 
-console.log("moth=>", mothershipStorage);
+console.log(mothershipStorage);
 /* [
  *   { content: 123, origin: 'Earth', destination: 'Mothership' },
  *   { text: 'abc', origin: 'Moon', destination: 'Mothership' }
