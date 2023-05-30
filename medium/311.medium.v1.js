@@ -22,21 +22,28 @@ function extendTransportSystem(classEarth, classMoon) {
                 get(obj, prop) {
                     if (typeof obj[prop] === "function" && prop === "transfer") {
                         return (...argsFn) => {
-                            const result = obj[prop].apply(obj, argsFn);
                             const transferArgs = argsFn[0];
+                            if (
+                                typeof transferArgs === "object" &&
+                                transferArgs !== null &&
+                                !Array.isArray(transferArgs)
+                            ) {
+                                const newParcel = JSON.parse(JSON.stringify(transferArgs));
+                                const result = obj[prop].apply(obj, argsFn);
 
-                            const newParcel = JSON.parse(JSON.stringify(transferArgs));
-                            newParcel.origin = transferArgs.destination;
-                            newParcel.destination = "Mothership";
+                                newParcel.origin = transferArgs.destination;
+                                newParcel.destination = "Mothership";
 
-                            matherRoute.push(newParcel);
-                            return result;
+                                matherRoute.push(newParcel);
+                                return result;
+                            }
+                            return;
                         };
                     }
                     return Reflect.get(obj, prop);
-                },
+                }
             });
-        },
+        }
     });
 
     MoonRoute = new Proxy(classMoon, {
@@ -45,27 +52,36 @@ function extendTransportSystem(classEarth, classMoon) {
                 get(obj, prop) {
                     if (typeof obj[prop] === "function" && prop === "transfer") {
                         return (...argsFn) => {
-                            const result = obj[prop].apply(obj, argsFn);
                             const transferArgs = argsFn[0];
+                            if (
+                                typeof transferArgs === "object" &&
+                                transferArgs !== null &&
+                                !Array.isArray(transferArgs)
+                            ) {
+                                const newParcel = JSON.parse(JSON.stringify(transferArgs));
+                                const result = obj[prop].apply(obj, argsFn);
 
-                            const newParcel = JSON.parse(JSON.stringify(transferArgs));
-                            newParcel.origin = transferArgs.destination;
-                            newParcel.destination = "Mothership";
+                                newParcel.origin = transferArgs.destination;
+                                newParcel.destination = "Mothership";
 
-                            matherRoute.push(newParcel);
-                            return result;
+                                matherRoute.push(newParcel);
+                                return result;
+                            }
+                            return;
                         };
                     }
                     return Reflect.get(obj, prop);
-                },
+                }
             });
-        },
+        }
     });
 
     matherRoute.__proto__.transfer = function (parcel) {
-        parcel.origin = parcel.destination;
-        parcel.destination = "Mothership";
-        this.push(parcel);
+        if (typeof parcel === "object" && parcel !== null && !Array.isArray(parcel)) {
+            parcel.origin = parcel.destination;
+            parcel.destination = "Mothership";
+            this.push(parcel);
+        }
     };
 
     return matherRoute;
@@ -76,10 +92,7 @@ const mothershipStorage = extendTransportSystem(EarthRoute, MoonRoute);
 const earthRoute1 = new EarthRoute();
 const moonRoute2 = new MoonRoute();
 
-earthRoute1.transfer({
-    origin: "",
-});
-earthRoute1.transfer({ content: 1232 });
+earthRoute1.transfer({ q: 11 }, { q: 22 });
 earthRoute1.transfer({ content: 1233 });
 moonRoute2.transfer({ text: "abc" });
 
