@@ -24,18 +24,19 @@ function extendTransportSystem(classEarth, classMoon) {
                         return (...argsFn) => {
                             const result = obj[prop].apply(obj, argsFn);
                             const transferArgs = argsFn[0];
-                            matherRoute.push({
-                                ...transferArgs,
-                                origin: transferArgs.destination,
-                                destination: "Mothership"
-                            });
+
+                            const newParcel = JSON.parse(JSON.stringify(transferArgs));
+                            newParcel.origin = transferArgs.destination;
+                            newParcel.destination = "Mothership";
+
+                            matherRoute.push(newParcel);
                             return result;
                         };
                     }
                     return Reflect.get(obj, prop);
-                }
+                },
             });
-        }
+        },
     });
 
     MoonRoute = new Proxy(classMoon, {
@@ -46,19 +47,26 @@ function extendTransportSystem(classEarth, classMoon) {
                         return (...argsFn) => {
                             const result = obj[prop].apply(obj, argsFn);
                             const transferArgs = argsFn[0];
-                            matherRoute.push({
-                                ...transferArgs,
-                                origin: transferArgs.destination,
-                                destination: "Mothership"
-                            });
+
+                            const newParcel = JSON.parse(JSON.stringify(transferArgs));
+                            newParcel.origin = transferArgs.destination;
+                            newParcel.destination = "Mothership";
+
+                            matherRoute.push(newParcel);
                             return result;
                         };
                     }
                     return Reflect.get(obj, prop);
-                }
+                },
             });
-        }
+        },
     });
+
+    matherRoute.__proto__.transfer = function (parcel) {
+        parcel.origin = parcel.destination;
+        parcel.destination = "Mothership";
+        this.push(parcel);
+    };
 
     return matherRoute;
 }
@@ -69,11 +77,13 @@ const earthRoute1 = new EarthRoute();
 const moonRoute2 = new MoonRoute();
 
 earthRoute1.transfer({
-    origin: ""
+    origin: "",
 });
 earthRoute1.transfer({ content: 1232 });
 earthRoute1.transfer({ content: 1233 });
 moonRoute2.transfer({ text: "abc" });
+
+mothershipStorage.transfer({ q: "1", destination: "WWe" });
 
 console.log(mothershipStorage);
 /* [

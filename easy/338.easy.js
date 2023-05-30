@@ -21,4 +21,4 @@ const sumExcept = (arr, from, count) => {
     return sum;
 };
 
-console.log(sumExcept([1, 9, 8, 4], 1, 5));
+// console.log(sumExcept([1, 9, 8, 4], 1, 5));
