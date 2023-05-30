@@ -25,8 +25,8 @@ module.exports = function merge(nums1, m, nums2, n) {
         }
         return;
     }
-    const direction1 = getDirection(nums1);
-    const direction2 = getDirection(nums2);
+    let direction1 = getDirection(nums1);
+    let direction2 = getDirection(nums2);
 
     const directionFull = direction1 + direction2;
 
@@ -36,18 +36,22 @@ module.exports = function merge(nums1, m, nums2, n) {
         }
         return;
     }
+
+    direction1 = direction1 === 0 ? 1 : direction1;
+    direction2 = direction2 === 0 ? 1 : direction2;
+
     const compFn1 = getCompareFn(direction1);
     const compFn2 = getCompareFn(direction2);
 
     let pNums1 = m - 1;
     let pNums2 = compFn1 === compFn2 ? n - 1 : 0;
 
-    const compFn = compFn1;
+    const compFn = getCompareFn(direction1);
 
     for (let i = m + n - 1; i >= 0; i--) {
         if (compFn(nums1[pNums1], nums2[pNums2]) || pNums1 < 0) {
             nums1[i] = nums2[pNums2];
-            if (direction1 === direction2) pNums2--;
+            if (compFn1 === compFn2) pNums2--;
             else pNums2++;
         } else {
             nums1[i] = nums1[pNums1];
