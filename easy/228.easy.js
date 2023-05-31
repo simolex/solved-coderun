@@ -102,8 +102,15 @@ class SearchTree {
 }
 
 module.exports = function (nums, k) {
-    tree = new SearchTree();
-    nums.forEach((v) => {
-        tree.add(v);
-    });
+    const tree = new SearchTree(compare);
+    const len = nums.length;
+    if (nums && len > 1) {
+        for (let i = 0; i < len; i++) {
+            const val = nums[i];
+            const rest = k - val;
+            if (tree.find(rest) !== null) return true;
+            tree.add(val);
+        }
+    }
+    return false;
 };

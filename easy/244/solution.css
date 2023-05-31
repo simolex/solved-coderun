@@ -1,0 +1,30 @@
+div {
+    position: relative;
+    border-radius: 36px;
+    background-color: #000;
+    overflow: hidden;
+}
+div::before {
+    content: "";
+    position: absolute;
+    background-color: transparent;
+    background-image: linear-gradient(145deg, #fcdd2e, #fcb600);
+    /* border-bottom-style: solid;
+    border-bottom-color: rgb(245, 244, 240);
+    border-bottom-width: 30px;
+    border-image: linear-gradient(178deg, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); */
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 50%;
+}
+div::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background-color: #f5f4f0;
+    background-image: linear-gradient(178deg, rgba(0, 0, 0, 0.18) 0px, rgba(0, 0, 0, 0) 7px, rgba(0, 0, 0, 0) 100%);
+    width: 50%;
+    height: 50%;
+}
