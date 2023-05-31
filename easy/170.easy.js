@@ -7,9 +7,9 @@
  */
 
 module.exports = function merge(nums1, m, nums2, n) {
-    const getDirection = (array) => {
+    const getDirection = (array, len) => {
         const first = array[0];
-        const end = array[array.length - 1];
+        const end = array[len - 1];
         return end - first;
     };
 
@@ -25,8 +25,8 @@ module.exports = function merge(nums1, m, nums2, n) {
         }
         return;
     }
-    let direction1 = getDirection(nums1);
-    let direction2 = getDirection(nums2);
+    let direction1 = getDirection(nums1, m);
+    let direction2 = getDirection(nums2, n);
 
     const directionFull = direction1 + direction2;
 

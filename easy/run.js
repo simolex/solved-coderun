@@ -1,7 +1,22 @@
-const merge = require("./170.easy.js");
+const { decode } = require("./320.easy.js");
 
-const num1 = [90, 80, 29, 18, 0];
-const num2 = [88];
+// const a = decode("Aa", [{ from: "a", to: "b" }]);
 
-merge(num1, 4, num2, num2.length);
-console.log(num1);
+const a = decode("Aa", [{ from: "a", to: "b" }]);
+// const a = decode("ab", [{ from: "a", to: "b" }]);
+
+// const a = decode("ab", [
+//     { from: "a", to: "ba" },
+//     { from: "b", to: "r" },
+// ]);
+
+// const a = decode("ab", [
+//     { from: "b", to: "bar" },
+//     { from: "ab", to: "foo" },
+// ]);
+
+// const a = decode("ab", [
+//     { from: "a", to: "bar" },
+//     { from: "ab", to: "foo" },
+// ]);
+console.log(a);
