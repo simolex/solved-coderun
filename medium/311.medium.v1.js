@@ -15,6 +15,7 @@ class MoonRoute {
 }
 
 function extendTransportSystem(classEarth, classMoon) {
+    console.dir(new MoonRoute());
     const matherRoute = [];
     EarthRoute = new Proxy(classEarth, {
         construct(target, args) {
@@ -41,9 +42,9 @@ function extendTransportSystem(classEarth, classMoon) {
                         };
                     }
                     return Reflect.get(obj, prop);
-                }
+                },
             });
-        }
+        },
     });
 
     MoonRoute = new Proxy(classMoon, {
@@ -71,9 +72,9 @@ function extendTransportSystem(classEarth, classMoon) {
                         };
                     }
                     return Reflect.get(obj, prop);
-                }
+                },
             });
-        }
+        },
     });
 
     matherRoute.__proto__.transfer = function (parcel) {
