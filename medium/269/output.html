@@ -13,7 +13,7 @@
         box-sizing: border-box;
     }
     html {
-        background-image: linear-gradient(45deg, #f45a3b, #ffffff);
+        /* background-image: linear-gradient(45deg, #f45a3b, #ffffff); */
     }
     body {
         margin: 0;
@@ -22,9 +22,8 @@
     .container {
         height: 780px;
         width: 570px;
-        padding-left: 30px;
+        padding-left: 31px;
         margin: 105px auto 115px;
-        border: 1px solid lime;
     }
     .wheelhouse {
         margin-left: 110px;
@@ -37,29 +36,30 @@
         height: 320px;
         width: 5px;
         background-color: #999999;
+        border: 1px solid
         position: relative;
     }
     .wheelhouse__flagpole::before {
         content: "";
         position: absolute;
-        right: 100%;
-        top: 5px;
-        border: 20px solid transparent;
-        border-right: 65px solid #ff0000;
+        right: 155%;
+        top: 10px;
+        border: 15px solid transparent;
+        border-right: 55px solid #ff0000;
     }
     .wheelhouse__roof {
-        width: 55px;
-        height: 10px;
+        width: 50px;
+        height: 8px;
         background-color: #000;
         border-radius: 5px 5px 0 0;
     }
     .wheelhouse__room {
         width: 55px;
-        height: 30px;
+        height: 32px;
         background-color: #666666;
     }
     .bottom-wheelhouse {
-        width: 95px;
+        width: 90px;
         height: 0px;
         border-bottom: 55px solid #000;
         border-left: 20px solid transparent;
@@ -78,7 +78,6 @@
     .carcass__roof::before {
         content: "";
         position: absolute;
-
         top: 0;
         left: 0;
         right: 0;
@@ -95,25 +94,23 @@
     .carcass__body {
         width: calc(100% - 20px);
         margin: 0 10px;
-
         height: 130px;
         background-color: #f45a3b;
         border-radius: 0px 0px 25px 25px;
+        border: 1px solid #ff0000;
     }
     .carcass__undercarriage {
         position: relative;
         width: calc(100% - 50px);
         margin: 10px 25px 0;
-
         height: 30px;
         background-color: #222;
-        /*  110 */
     }
     .carcass__undercarriage::before {
         position: absolute;
         content: "";
         height: 0px;
-        border-bottom: 10px solid #000;
+        border-bottom: 10px solid #222;
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
         bottom: 100%;
@@ -123,18 +120,19 @@
         position: absolute;
         content: "";
         height: 0px;
-        border-top: 70px solid #000;
+        border-top: 70px solid #222;
         border-left: 70px solid transparent;
         border-right: 70px solid transparent;
         top: 100%;
         width: calc(100% - 140px);
-        z-index: -1;
+        z-index: -5;
     }
     .carcass__wheels {
         display: flex;
-        justify-content: space-evenly;
+        justify-content: space-between;
         align-items: center;
-        width: 100%;
+        padding-left: 35px;
+        width: calc(100% - 25px);
     }
     .carcass__wheel {
         width: 130px;
