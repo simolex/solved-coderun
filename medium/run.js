@@ -1,7 +1,7 @@
-const decode = require("./159.medium.js");
+const isRelativies = require("./296.medium.js");
 
 console.log(
-    decode(`= head
+    isRelativies(`= head
 
 text ((https://ya.ru link)) text.
 
