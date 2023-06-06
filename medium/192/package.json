@@ -1,0 +1,16 @@
+{
+    "name": "fast-five",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "fiberthrone",
+    "license": "MIT",
+    "private": true,
+    "devDependencies": {
+        "@types/jest": "^29.5.2",
+        "jest": "^27.0.5"
+    },
+    "scripts": {
+        "start": "jest --watchAll",
+        "test": "jest"
+    }
+}
