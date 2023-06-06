@@ -24,13 +24,13 @@ function scan(matrix) {
         const countTouch = { touchRoof: 0, touchFloor: 0 };
         while (stack.length > 0) {
             const [currentX, currentY] = stack.pop();
-            if (isCave(currentX, currentY) && isObject(currentX, currentY)) {
+            if (isObject(currentX, currentY)) {
                 counterTouch(countTouch, currentY);
                 [
                     [-1, 0],
                     [0, -1],
                     [1, 0],
-                    [0, 1]
+                    [0, 1],
                 ].forEach(([dx, dy]) =>
                     isCave(currentX + dx, currentY + dy) && isObject(currentX + dx, currentY + dy)
                         ? stack.push([currentX + dx, currentY + dy])
@@ -54,8 +54,10 @@ function scan(matrix) {
             nextDFStep(result, i, 0);
         }
     }
-
-    console.log(result);
-
+    for (let i = 0; i < M; i++) {
+        if (isObject(i, N - 1)) {
+            nextDFStep(result, i, N - 1);
+        }
+    }
     return result;
 }
