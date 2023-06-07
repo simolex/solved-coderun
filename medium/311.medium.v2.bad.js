@@ -46,7 +46,7 @@ function extendTransportSystem(classEarth, classMoon) {
             } else {
                 newParcel = JSON.parse(JSON.stringify(parcel));
             }
-            newParcel.origin = parcel.destination;
+            newParcel.origin = newParcel.destination;
             newParcel.destination = "Mothership";
 
             motherRoute.push(newParcel);
@@ -63,7 +63,7 @@ function extendTransportSystem(classEarth, classMoon) {
             } else {
                 newParcel = JSON.parse(JSON.stringify(parcel));
             }
-            newParcel.origin = parcel.destination;
+            newParcel.origin = newParcel.destination;
             newParcel.destination = "Mothership";
 
             motherRoute.push(newParcel);
