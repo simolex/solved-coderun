@@ -8,27 +8,61 @@
 function calcFontVariationSettings(container, str, min, max) {
     const textWrapper = document.createElement("span");
     textWrapper.innerHTML = str;
-    textWrapper.style.fontVariationSettings = `'wdth' ${max}`;
-    textWrapper.style.display = "block";
-    // textWrapper.style.width = "auto";
-    container.style.overflow = "auto";
-    container.style.display = "block";
+    textWrapper.style.display = "inline-block";
     container.appendChild(textWrapper);
 
-    let observer = new IntersectionObserver((entries) => {
-        console.log(entries);
-        // console.log(entries[0].target);
-        // console.log(entries[0].time);
-        if (entries[0].boundingClientRect) {
-            console.log("Прокручено 100px");
+    function ContainerSize(container) {
+        let width, height;
+
+        const contStyle = container.style;
+        const rect = container.getBoundingClientRect();
+
+        if (container.style.boxSizing === "border-box") {
+            const borderWidth =
+                parseFloat(contStyle.borderRightWidth) || 0 + parseFloat(contStyle.borderLeftWidth) || 0;
+            const borderHeight =
+                parseFloat(contStyle.borderBottomWidth) || 0 + parseFloat(contStyle.borderTopWidth) || 0;
+            const paddingWidth = parseFloat(contStyle.paddingRight) || 0 + parseFloat(contStyle.paddingLeft) || 0;
+            const paddingHeight = parseFloat(contStyle.paddingBottom) || 0 + parseFloat(contStyle.paddingTop) || 0;
+
+            const wrapWidthSize = borderWidth + paddingWidth;
+            const wrapHeigthSize = borderHeight + paddingHeight;
+
+            width = rect.width - wrapWidthSize;
+            height = rect.height - wrapHeigthSize;
         } else {
-            console.log("Прокручено менее 100px");
+            width = contStyle.width;
+            height = contStyle.height;
         }
-    });
-    observer.observe(textWrapper, { root: container, threshold: 1.0 });
+
+        return { getWidth: () => parseFloat(width), getHeight: () => parseFloat(height) };
+    }
+
+    const Parent = ContainerSize(container);
+
+    const isInsize = (el) => {
+        const rect = el.getBoundingClientRect();
+
+        console.log({ elW: rect.width, pW: Parent.getWidth(), elH: rect.height, pH: Parent.getHeight() });
+
+        if (rect.width <= Parent.getWidth() && rect.height <= Parent.getHeight()) return true;
+        return false;
+    };
+    // console.log((textWrapper.style.fontVariationSettings = `'wdth' ${4}`));
+    // isInsize(textWrapper);
+    // console.log((textWrapper.style.fontVariationSettings = `'wdth' ${150}`));
+    // isInsize(textWrapper);
+
+    let current = max;
+    do {
+        textWrapper.style.fontVariationSettings = `'wdth' ${current}`;
+        current -= 1;
+    } while (!isInsize(textWrapper) && current >= min - 1);
+    current++;
+    return current >= min ? current : false;
 }
 
 document.fonts.onloadingdone = () => {
     console.log("Font loading complete");
-    calcFontVariationSettings(document.getElementById("container"), `DEMO`, 0, 149);
+    console.log(calcFontVariationSettings(document.getElementById("container"), `DEMO DEMO DEMO  DEMO`, 0, 150));
 };
