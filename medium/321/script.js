@@ -13,9 +13,11 @@ function calcFontVariationSettings(container, str, min, max) {
     if (max < 1 || str.length === 0 || !container) return null;
     const textWrapper = document.createElement("span");
     textWrapper.textContent = str;
-    textWrapper.style.display = "inline-block";
-    textWrapper.visibility = "hidden";
-    textWrapper.style.whiteSpace = "nowrap";
+    textWrapper.style.display = "block";
+    textWrapper.style.width = "fit-content";
+
+    // textWrapper.visibility = "hidden";
+    // textWrapper.style.whiteSpace = "nowrap";
     container.appendChild(textWrapper);
 
     function ContainerSize(container) {
@@ -26,17 +28,11 @@ function calcFontVariationSettings(container, str, min, max) {
 
         if (container.style.boxSizing === "border-box") {
             const borderWidth =
-                parseFloat(contStyle.borderRightWidth) ||
-                0 + parseFloat(contStyle.borderLeftWidth) ||
-                0;
+                parseFloat(contStyle.borderRightWidth) || 0 + parseFloat(contStyle.borderLeftWidth) || 0;
             const borderHeight =
-                parseFloat(contStyle.borderBottomWidth) ||
-                0 + parseFloat(contStyle.borderTopWidth) ||
-                0;
-            const paddingWidth =
-                parseFloat(contStyle.paddingRight) || 0 + parseFloat(contStyle.paddingLeft) || 0;
-            const paddingHeight =
-                parseFloat(contStyle.paddingBottom) || 0 + parseFloat(contStyle.paddingTop) || 0;
+                parseFloat(contStyle.borderBottomWidth) || 0 + parseFloat(contStyle.borderTopWidth) || 0;
+            const paddingWidth = parseFloat(contStyle.paddingRight) || 0 + parseFloat(contStyle.paddingLeft) || 0;
+            const paddingHeight = parseFloat(contStyle.paddingBottom) || 0 + parseFloat(contStyle.paddingTop) || 0;
 
             const wrapWidthSize = borderWidth + paddingWidth;
             const wrapHeigthSize = borderHeight + paddingHeight;
