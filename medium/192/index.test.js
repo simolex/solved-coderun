@@ -4,7 +4,7 @@ const setForTest1 = require("./test-set1.js");
 describe("192.musicMan", () => {
     test("test 1", () => {
         const result = remember(setForTest1);
-        expect(result).toEqual(`## Жанры
+        expect(result).toBe(`## Жанры
 
 - Нерок: Бритый гриб
 - Рок
