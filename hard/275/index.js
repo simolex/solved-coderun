@@ -2,14 +2,14 @@ const Good = {
     type: "good",
     name: "", // string;
     comments: [], // Comment[];
-    related: [], // Good[];
+    related: [] // Good[];
 };
 
 const Comment = {
     type: "comment",
     text: "", // string;
     comments: [], // Comment[];
-    parent: {}, // Good | Comment;
+    parent: {} // Good | Comment;
 };
 
 /**
@@ -56,6 +56,43 @@ module.exports = function (data) {
             }
         }
     }
-    console.log(findedObjects);
-    return "…";
+    const getSortField = (obj) => (obj.type === "good" ? obj.name : obj.text);
+    const sortFn = (a, b) => (getSortField(a) > getSortField(b) ? 1 : getSortField(a) < getSortField(b) ? -1 : 0);
+    findedObjects.sort(sortFn);
+
+    const getComments = (input, obj, tabStr, level) => {
+        input += `${tabStr.repeat(level)}- ${obj.text}${
+            obj.parent.type === "good" ? ` - про ${obj.parent.name}` : ""
+        }\n`;
+        let output =
+            input + obj.comments.sort(sortFn).reduce((out, sub) => out + getComments("", sub, tabStr, level + 1), "");
+
+        return output;
+    };
+
+    let commentsInMD = "";
+    let goodsInMD = "";
+
+    findedObjects.forEach((obj) => {
+        if (obj.type === "comment" && obj.vizited !== "2" && obj.parent.type === "good") {
+            let record = getComments("", obj, "  ", 0);
+            commentsInMD += record;
+            obj.vizited = "2";
+        }
+
+        if (obj.type === "good" && obj.vizited !== "2") {
+            console.log("====> ", obj);
+            goodsInMD += `- ${obj.name}\n${obj.related
+                .sort(sortFn)
+                .map((n) => `  * ${n.name}\n`)
+                .join("")}`;
+            obj.vizited = "2";
+        }
+    });
+
+    // console.log(goodsInMD);
+    const result = `${commentsInMD.length > 0 ? `## Отзывы\n\n${commentsInMD}\n` : ""}${
+        goodsInMD.length > 0 ? `## Товары\n\n${goodsInMD}` : ""
+    }`;
+    return result;
 };
