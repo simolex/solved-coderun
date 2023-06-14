@@ -10,19 +10,15 @@ module.exports = function (mapString) {
 
     const isNumber = (n) => !isNaN(parseFloat(n)) && !isNaN(n - 0);
 
-    // class Bot {
-    //     constructor(map, dotIndex, direction) {
-    //         [this.x, this.y] = dots[dotIndex];
-    //         this.map = map;
-    //         this.direction = direction;
-    //     }
-    // }
     const createDot = (x, y) => ({ currentTik: [], nextTik: [[x, y]] });
     const inMap = (x, y) => x > 0 && x < widthPot - 1 && y > 0 && y < heightPot - 1;
     const markVisited = (x, y) => (map[y][x] = "~");
 
-    const isLetter = (x, y) => /[A-Z]/.test(map[y][x]);
-    const isEmpty = (x, y) => /[ ]/.test(map[y][x]);
+    const isLetter = (x, y) => {
+        const ch = map[y][x].charCodeAt(0);
+        return ch >= 65 && ch <= 90;
+    };
+    const isEmpty = (x, y) => map[y][x] === " ";
     const isPosable = (x, y) => isLetter(x, y) || isEmpty(x, y);
 
     for (let i = 1; i < widthPot - 1; i++) {
