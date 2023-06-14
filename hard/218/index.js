@@ -21,6 +21,8 @@ module.exports = function (mapString) {
     const isEmpty = (x, y) => map[y][x] === " ";
     const isPosable = (x, y) => isLetter(x, y) || isEmpty(x, y);
 
+    const aaa = performance.now();
+
     for (let i = 1; i < widthPot - 1; i++) {
         if (isNumber(map[0][i])) dots[map[0][i]] = createDot(i, 0);
         if (isNumber(map[heightPot - 1][i])) dots[map[heightPot - 1][i]] = createDot(i, heightPot - 1);
@@ -30,6 +32,9 @@ module.exports = function (mapString) {
         if (isNumber(map[i][0])) dots[map[i][0]] = createDot(0, i);
         if (isNumber(map[i][widthPot - 1])) dots[map[i][widthPot - 1]] = createDot(widthPot - 1, i);
     }
+    const bbb = performance.now();
+    console.log("=====>", bbb - aaa);
+
     let maxTik = 1;
     let tik = 0;
     while (Object.keys(dots).length > 0) {
