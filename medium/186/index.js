@@ -9,7 +9,6 @@ interface Commit {
 */
 
 function getLastCommonCommitMessage(commits, branches) {
-    console.log(`[\s]`);
     return "add layout";
 }
 
