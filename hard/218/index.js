@@ -44,6 +44,7 @@ module.exports = function (mapString) {
         [0, 1]
     ];
     let dotsCount = Object.keys(dots).length;
+    console.log(dotsCount);
     while (dotsCount > 0) {
         tik++;
         for (let dotKey in dots) {
