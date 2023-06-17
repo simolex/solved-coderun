@@ -10,7 +10,7 @@ module.exports = function (mapString) {
 
     const isNumber = (n) => !isNaN(parseFloat(n)) && !isNaN(n - 0);
 
-    const createDot = (x, y) => ({ currentTik: [], nextTik: [[x, y]] });
+    const createDot = (x, y) => ({ currentTik: { buffer: [], count: 0 }, nextTik: { buffer: [{ x, y }], count: 1 } });
     const inMap = (x, y) => x > 0 && x < widthPot - 1 && y > 0 && y < heightPot - 1;
     const markVisited = (x, y) => (map[y][x] = "~");
 
@@ -19,7 +19,7 @@ module.exports = function (mapString) {
         return ch >= 65 && ch <= 90;
     };
     const isEmpty = (x, y) => map[y][x] === " ";
-    const isPosable = (x, y) => isLetter(x, y) || isEmpty(x, y);
+    const isPosable = (x, y) => map[y][x] !== "~"; //isLetter(x, y) || isEmpty(x, y);
 
     const aaa = performance.now();
 
@@ -37,34 +37,48 @@ module.exports = function (mapString) {
 
     let maxTik = 1;
     let tik = 0;
-    while (Object.keys(dots).length > 0) {
+    const directions = [
+        [-1, 0],
+        [0, -1],
+        [1, 0],
+        [0, 1]
+    ];
+    let dotsCount = Object.keys(dots).length;
+    while (dotsCount > 0) {
         tik++;
         for (let dotKey in dots) {
+            if (dots[dotKey].isEmpty) continue;
+            dots[dotKey].saveCurrentTik = dots[dotKey].currentTik;
             dots[dotKey].currentTik = dots[dotKey].nextTik;
-            delete dots[dotKey].nextTik;
-            dots[dotKey].nextTik = [];
+            dots[dotKey].nextTik = dots[dotKey].saveCurrentTik;
+            dots[dotKey].nextTik.count = 0;
 
             let findedLetter = false;
-            for (const [currentX, currentY] of dots[dotKey].currentTik) {
+            for (let i = 0; i < dots[dotKey].currentTik.count; i++) {
+                const { x: currentX, y: currentY } = dots[dotKey].currentTik.buffer[i];
                 if (isLetter(currentX, currentY)) {
                     findedLetter = true;
                 }
-                [
-                    [-1, 0],
-                    [0, -1],
-                    [1, 0],
-                    [0, 1]
-                ].forEach(([dx, dy]) =>
-                    inMap(currentX + dx, currentY + dy) && isPosable(currentX + dx, currentY + dy)
-                        ? dots[dotKey].nextTik.push([currentX + dx, currentY + dy])
-                        : false
-                );
+                directions.forEach(([dx, dy]) => {
+                    if (inMap(currentX + dx, currentY + dy) && isPosable(currentX + dx, currentY + dy)) {
+                        if (!dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count]) {
+                            dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count] = {};
+                        }
+                        dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count].x = currentX + dx;
+                        dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count].y = currentY + dy;
+                        dots[dotKey].nextTik.count++;
+                    }
+                });
                 markVisited(currentX, currentY);
             }
             if (findedLetter) maxTik = Math.max(maxTik, tik);
-            if (dots[dotKey].nextTik.length === 0) delete dots[dotKey];
+            if (dots[dotKey].nextTik.count === 0) {
+                dots[dotKey].isEmpty = true;
+                dotsCount--;
+            }
         }
     }
-
+    const ccc = performance.now();
+    console.log("=====>", ccc - bbb);
     return maxTik; //timeInSec; // Время в секундах, за которое все буквы вытекли
 };
