@@ -1,7 +1,8 @@
 module.exports = function (mapString) {
-    const mapLines = mapString.trim().split("\n");
+    const mapLines = mapString.split("\n");
+
     const map = mapLines.reduce((mapArray, line) => {
-        mapArray.push(line.trim().split(""));
+        mapArray.push(line.split(""));
         return mapArray;
     }, []);
     const heightPot = map.length;
@@ -10,9 +11,12 @@ module.exports = function (mapString) {
 
     const isNumber = (n) => !isNaN(parseFloat(n)) && !isNaN(n - 0);
 
-    const createDot = (x, y) => ({ currentTik: { buffer: [], count: 0 }, nextTik: { buffer: [{ x, y }], count: 1 } });
-    const inMap = (x, y) => x > 0 && x < widthPot - 1 && y > 0 && y < heightPot - 1;
-    const markVisited = (x, y) => (map[y][x] = "~");
+    const createDot = (x, y) => ({
+        currentTik: { buffer: [], count: 0 },
+        nextTik: { buffer: [{ x, y }], count: 1 },
+    });
+    const inMap = (x, y) => x >= 0 && x < widthPot && y >= 0 && y < heightPot;
+    // const markVisited = (x, y) => (map[y][x] = "~");
 
     const isLetter = (x, y) => {
         const ch = map[y][x].charCodeAt(0);
@@ -23,7 +27,8 @@ module.exports = function (mapString) {
 
     for (let i = 1; i < widthPot - 1; i++) {
         if (isNumber(map[0][i])) dots[map[0][i]] = createDot(i, 0);
-        if (isNumber(map[heightPot - 1][i])) dots[map[heightPot - 1][i]] = createDot(i, heightPot - 1);
+        if (isNumber(map[heightPot - 1][i]))
+            dots[map[heightPot - 1][i]] = createDot(i, heightPot - 1);
     }
 
     for (let i = 1; i < heightPot - 1; i++) {
@@ -37,7 +42,7 @@ module.exports = function (mapString) {
         [-1, 0],
         [0, -1],
         [1, 0],
-        [0, 1]
+        [0, 1],
     ];
     let dotsCount = Object.keys(dots).length;
     while (dotsCount > 0) {
@@ -53,10 +58,13 @@ module.exports = function (mapString) {
             for (let i = 0; i < dots[dotKey].currentTik.count; i++) {
                 const { x: currentX, y: currentY } = dots[dotKey].currentTik.buffer[i];
                 if (isLetter(currentX, currentY)) {
-                    findedLetter = true;
+                    maxTik = tik; // findedLetter = true;
                 }
                 directions.forEach(([dx, dy]) => {
-                    if (inMap(currentX + dx, currentY + dy) && isPosable(currentX + dx, currentY + dy)) {
+                    if (
+                        inMap(currentX + dx, currentY + dy) &&
+                        isPosable(currentX + dx, currentY + dy)
+                    ) {
                         if (!dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count]) {
                             dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count] = {};
                         }
@@ -65,9 +73,10 @@ module.exports = function (mapString) {
                         dots[dotKey].nextTik.count++;
                     }
                 });
-                markVisited(currentX, currentY);
+                //markVisited(currentX, currentY);
+                map[currentY][currentX] = "~";
             }
-            if (findedLetter) maxTik = Math.max(maxTik, tik);
+            // if (findedLetter) maxTik = tik; //Math.max(maxTik, tik);
             if (dots[dotKey].nextTik.count === 0) {
                 dots[dotKey].isEmpty = true;
                 dotsCount--;
