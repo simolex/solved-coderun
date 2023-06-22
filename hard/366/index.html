@@ -77,40 +77,40 @@
                     2: "личное",
                     3: "рабочее",
                     4: "Проект X",
-                    5: "Проект Y",
+                    5: "Проект Y"
                 },
                 letters: [
                     {
                         id: "1",
                         title: "Приглашение на день рождения",
-                        tags: ["1", "2"],
+                        tags: ["1", "2"]
                     },
                     {
                         id: "2",
                         title: "Ответ на ваш комментарий",
-                        tags: ["2"],
+                        tags: ["2"]
                     },
                     {
                         id: "3",
                         title: "Резюме последней встречи про X",
-                        tags: ["3", "4"],
+                        tags: ["3", "4"]
                     },
                     {
                         id: "4",
                         title: "Расчётный лист",
-                        tags: ["1", "3"],
+                        tags: ["1", "3"]
                     },
                     {
                         id: "5",
                         title: "Нужна помощь с Y",
-                        tags: ["3", "5"],
+                        tags: ["3", "5"]
                     },
                     {
                         id: "6",
                         title: "Регулярная рассылка для клиентов",
-                        tags: [],
-                    },
-                ],
+                        tags: []
+                    }
+                ]
             };
 
             function mapAndJoin(a, f, s = "") {
@@ -146,18 +146,25 @@
                 const tagsZone = mainZone.querySelector(".Tags");
 
                 let currentTag = null;
+                let currentTagId = null;
                 const setCurrentTag = (el) => (currentTag = el);
+                const setCurrentTagId = (el) => (currentTagId = el);
 
                 const setTagToLetter = (letterId, tagId) => {
                     const letterIndex = data.letters.findIndex((letter) => letter.id === letterId);
                     data.letters[letterIndex].tags.push(tagId);
                 };
 
+                const getRemovedTag = (letter) => letter.querySelector(`.Tag_removed[data-tag-id="${currentTagId}"]`);
+                const getActualTag = (letter) =>
+                    letter.querySelector(`.Tag[data-tag-id="${currentTagId}"]:not(.Tag_removed)`);
+
+                const isTaggableLetter = (letter) =>
+                    currentTagId && letter && (!getActualTag(letter) || getRemovedTag(letter));
+
                 const removeTagFromLetter = (letterId, tagId) => {
                     const letterIndex = data.letters.findIndex((letter) => letter.id === letterId);
-                    data.letters[letterIndex].tags = data.letters[letterIndex].tags.filter(
-                        (tag) => tag !== tagId
-                    );
+                    data.letters[letterIndex].tags = data.letters[letterIndex].tags.filter((tag) => tag !== tagId);
                 };
 
                 if (!tagsZone || !lettersZone || !mainZone) {
@@ -173,12 +180,10 @@
                         e.target.classList.contains("Tags_dropzone")
                     ) {
                         e.target.classList.add("Tags_dragovered");
-                        // currentTag.style.display = "none";
                     }
                 });
                 tagsZone.addEventListener("dragleave", (e) => {
                     e.target.classList.remove("Tags_dragovered");
-                    // currentTag.style.display = "";
                 });
 
                 tagsZone.addEventListener("dragover", (e) => {
@@ -197,135 +202,51 @@
                     }
 
                     e.preventDefault();
-
-                    removeTagFromLetter(
-                        currentTag.closest(".Letter").dataset.letterId,
-                        currentTag.dataset.tagId
-                    );
-                    currentTag.parentNode.removeChild(currentTag);
-                    setCurrentTag(null);
-                    tagsZone.classList.remove("Tags_dropzone");
-                    tagsZone.classList.remove("Tags_dragovered");
-                    lettersZone.classList.remove("Letters_dropzone");
+                    setCurrentTagId(null);
+                    e.dataTransfer.getData("text/plain");
                 });
 
-                // lettersZone.addEventListener(
-                //     "dragenter",
-                //     (e) => {
-                //         // if (e.target.classList.contains("Letters"))
-                //         console.log(e.target, "enter-letters");
-
-                //         // if (currentTag && e.target.closest(`.Letter`)) {
-                //         //     const availibleLetters = lettersZone.querySelectorAll(
-                //         //         `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                //         //     );
-                //         //     availibleLetters &&
-                //         //         availibleLetters.forEach((letter) =>
-                //         //             letter.classList.add("Letter_dragovered")
-                //         //         );
-                //         //     // e.target.classList.add("Letter_dragovered");
-                //         // }
-                //     },
-                //     false
-                // );
-
-                // lettersZone.addEventListener("dragleave", (e) => {
-                //     console.log("leave-letters");
-
-                //     // if (
-                //     //     currentTag &&
-                //     //     e.target.closest(
-                //     //         `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                //     //     )
-                //     // ) {
-                //     //     const availibleLetters = lettersZone.querySelectorAll(`.Letter`);
-                //     //     availibleLetters &&
-                //     //         availibleLetters.forEach((letter) =>
-                //     //             letter.classList.remove("Letter_dragovered")
-                //     //         );
-                //     // }
-                // });
-
                 lettersZone.addEventListener("dragenter", (e) => {
-                    if (
-                        currentTag &&
-                        e.target.closest(
-                            `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                        )
-                    ) {
-                        e.target.classList.add("Letter_dragovered");
+                    const overTarget = e.target.closest(".Letter");
+
+                    if (isTaggableLetter(overTarget)) {
+                        overTarget.classList.add("Letter_dragovered");
                     }
                 });
 
                 lettersZone.addEventListener("dragleave", (e) => {
-                    if (
-                        currentTag &&
-                        e.target.closest(
-                            `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                        )
-                    ) {
-                        e.target.classList.remove("Letter_dragovered");
+                    const overTarget = e.target.closest(".Letter");
+                    if (isTaggableLetter(overTarget)) {
+                        overTarget.classList.remove("Letter_dragovered");
                     }
                 });
 
                 lettersZone.addEventListener("dragover", (e) => {
-                    if (currentTag !== null && !currentTag.classList.contains("Tag")) {
-                        return;
-                    }
-
-                    if (
-                        currentTag &&
-                        e.target.closest(
-                            `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                        )
-                    ) {
+                    const overTarget = e.target.closest(".Letter");
+                    if (isTaggableLetter(overTarget)) {
                         e.preventDefault();
                     }
-                    return false;
                 });
 
                 lettersZone.addEventListener("drop", (e) => {
                     e.stopPropagation();
+                    const overTarget = e.target.closest(".Letter");
 
-                    if (
-                        currentTag &&
-                        e.target.closest(
-                            `.Letter:not(:has(.Tag[data-tag-id="${currentTag.dataset.tagId}"]))`
-                        )
-                    ) {
+                    if (isTaggableLetter(overTarget)) {
                         e.preventDefault();
-                        if (currentTag.closest(".Letters")) {
-                            removeTagFromLetter(
-                                currentTag.closest(".Letter").dataset.letterId,
-                                currentTag.dataset.tagId
+                        const removedTag = getRemovedTag(overTarget);
+                        if (removedTag) {
+                            removedTag.classList.remove("Tag_removed");
+                            overTarget.insertAdjacentElement("beforeend", removedTag);
+                        } else {
+                            overTarget.insertAdjacentHTML(
+                                "beforeend",
+                                buildTagHtml(currentTagId, data.tags[currentTagId])
                             );
-                            setTagToLetter(
-                                e.target.closest(".Letter").dataset.letterId,
-                                currentTag.dataset.tagId
-                            );
-                            e.target
-                                .closest(".Letter")
-                                // .querySelector(".Letter__Title")
-                                // .insertAdjacentElement("afterend", currentTag);
-                                .insertAdjacentElement("beforeend", currentTag);
-                        }
-                        if (currentTag.closest(".Tags")) {
-                            const cloneTag = currentTag.cloneNode(true);
-                            const appendedNode = e.target
-                                .closest(".Letter")
-                                // .querySelector(".Letter__Title")
-                                // .insertAdjacentElement("afterend", cloneTag);
-                                .insertAdjacentElement("beforeend", cloneTag);
-
-                            appendedNode.classList.remove("Tag_dragged");
-
-                            setTagToLetter(
-                                e.target.closest(".Letter").dataset.letterId,
-                                currentTag.dataset.tagId
-                            );
+                            getActualTag(overTarget).draggable = true;
                         }
                     }
-                    setCurrentTag(null);
+                    setCurrentTagId(null);
                 });
 
                 mainZone.addEventListener("dragstart", (e) => {
@@ -333,17 +254,15 @@
                         return;
                     }
 
-                    setCurrentTag(e.target);
+                    setCurrentTagId(e.target.dataset.tagId);
 
                     e.target.classList.add("Tag_dragged");
 
-                    e.dataTransfer.effectAllowed = "copy";
-                    e.dataTransfer.setData("text/html", e.target.outerHTML);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", currentTag);
 
                     lettersZone.classList.add("Letters_dropzone");
                     if (e.target.closest(".Letter")) {
-                        e.dataTransfer.effectAllowed = "copyMove";
-
                         tagsZone.classList.add("Tags_dropzone");
                     }
                 });
@@ -355,12 +274,18 @@
                     e.target.classList.remove("Tag_dragged");
                     lettersZone.classList.remove("Letters_dropzone");
                     tagsZone.classList.remove("Tags_dropzone");
+                    tagsZone.classList.remove("Tags_dragovered");
 
                     lettersZone
                         .querySelectorAll(".Letter")
                         .forEach((letter) => letter.classList.remove("Letter_dragovered"));
 
+                    if (e.target.closest(".Letter") && e.dataTransfer.dropEffect !== "none") {
+                        e.target.classList.add("Tag_removed");
+                    }
+
                     setCurrentTag(null);
+                    e.dataTransfer.clearData();
                 });
             }
 
