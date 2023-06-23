@@ -15,23 +15,14 @@ module.exports = function (mapString) {
         currentTik: { buffer: [], count: 0 },
         nextTik: { buffer: [{ x, y }], count: 1 },
     });
-    const inMap = (x, y) => x >= 0 && x < widthPot && y >= 0 && y < heightPot;
-    // const markVisited = (x, y) => (map[y][x] = "~");
 
-    const isLetter = (x, y) => {
-        const ch = map[y][x].charCodeAt(0);
-        return ch >= 65 && ch <= 90;
-    };
-    const isEmpty = (x, y) => map[y][x] === " ";
-    const isPosable = (x, y) => map[y][x] !== "~"; //isLetter(x, y) || isEmpty(x, y);
-
-    for (let i = 1; i < widthPot - 1; i++) {
+    for (let i = 0; i < widthPot; i++) {
         if (isNumber(map[0][i])) dots[map[0][i]] = createDot(i, 0);
         if (isNumber(map[heightPot - 1][i]))
             dots[map[heightPot - 1][i]] = createDot(i, heightPot - 1);
     }
 
-    for (let i = 1; i < heightPot - 1; i++) {
+    for (let i = 0; i < heightPot; i++) {
         if (isNumber(map[i][0])) dots[map[i][0]] = createDot(0, i);
         if (isNumber(map[i][widthPot - 1])) dots[map[i][widthPot - 1]] = createDot(widthPot - 1, i);
     }
@@ -54,17 +45,18 @@ module.exports = function (mapString) {
             dots[dotKey].nextTik = dots[dotKey].saveCurrentTik;
             dots[dotKey].nextTik.count = 0;
 
-            let findedLetter = false;
+            //let findedLetter = false;
             for (let i = 0; i < dots[dotKey].currentTik.count; i++) {
                 const { x: currentX, y: currentY } = dots[dotKey].currentTik.buffer[i];
-                if (isLetter(currentX, currentY)) {
+                const ch = map[currentY][currentX].charCodeAt(0);
+
+                if (ch >= 65 && ch <= 90) {
                     maxTik = tik; // findedLetter = true;
                 }
                 directions.forEach(([dx, dy]) => {
-                    if (
-                        inMap(currentX + dx, currentY + dy) &&
-                        isPosable(currentX + dx, currentY + dy)
-                    ) {
+                    const x = currentX + dx;
+                    const y = currentY + dy;
+                    if (x >= 0 && x < widthPot && y >= 0 && y < heightPot && map[y][x] !== "~") {
                         if (!dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count]) {
                             dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count] = {};
                         }
