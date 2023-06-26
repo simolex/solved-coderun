@@ -26,5 +26,8 @@
  */
 
 module.exports = function (html, css) {
+    const oneTagPattern = "([^\\s\\~\\+\\>]+)";
+
+    const dfsHtml = (root, fnNode) => {};
     return "";
 };
