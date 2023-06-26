@@ -27,6 +27,12 @@
 
 module.exports = function (html, css) {
     const oneTagPattern = "([^\\s\\~\\+\\>]+)";
+    const comboSymbolPattern = "(?:(?<![>~\\+])(\\s+)(?![>~\\+])|(?:\\s*([>~\\+])\\s*))";
+
+    const re = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
+    for (const oneStyle of css) {
+        console.log(re.exec(oneStyle.selector));
+    }
 
     const dfsHtml = (root, fnNode) => {};
     return "";
