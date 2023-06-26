@@ -27,11 +27,56 @@
 
 module.exports = function (html, css) {
     const oneTagPattern = "([^\\s\\~\\+\\>]+)";
-    const comboSymbolPattern = "(?:(?<![>~\\+])(\\s+)(?![>~\\+])|(?:\\s*([>~\\+])\\s*))";
+    // const comboSymbolPattern = "(?:(?<![>~\\+])(\\s+)(?![>~\\+])|(?:\\s*([>~\\+])\\s*))";
+    const comboSymbolPattern = "((?<![>~\\+])\\s?[>~\\+]?)\\s*";
+    const setOfSelectors = {};
 
-    const re = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
+    const regSelector = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
     for (const oneStyle of css) {
-        console.log(re.exec(oneStyle.selector));
+        // console.log(re.exec(oneStyle.selector.split(" ").filter(Boolean).join(" ")));
+        const selector = regSelector.exec(oneStyle.selector.split(" ").filter(Boolean).join(" "));
+        if (selector[3] === undefined) {
+            if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+            setOfSelectors[selector[1]].push({
+                isSimpleStyle: true,
+                appliedStyle: { ...oneStyle.declarations }
+            });
+        } else {
+            switch (selector[2].trim()) {
+                case "":
+                    setOfSelectors[selector[1]].push({
+                        isInheritable: true,
+                        appliedTag: selector[3],
+                        appliedStyle: { ...oneStyle.declarations }
+                    });
+                    break;
+                case ">":
+                    setOfSelectors[selector[1]].push({
+                        isOnceInheritable: true,
+                        appliedTag: selector[3],
+                        appliedStyle: { ...oneStyle.declarations }
+                    });
+                    break;
+                case "~":
+                    setOfSelectors[selector[1]].push({
+                        isIntimate: true,
+                        appliedTag: selector[3],
+                        appliedStyle: { ...oneStyle.declarations }
+                    });
+                    break;
+                case "+":
+                    setOfSelectors[selector[1]].push({
+                        isNeighbor: true,
+                        appliedTag: selector[3],
+                        appliedStyle: { ...oneStyle.declarations }
+                    });
+                    break;
+            }
+        }
+    }
+
+    for (const key in setOfSelectors) {
+        setOfSelectors[key];
     }
 
     const dfsHtml = (root, fnNode) => {};
