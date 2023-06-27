@@ -39,7 +39,7 @@ module.exports = function (html, css) {
             if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
             setOfSelectors[selector[1]].push({
                 isSimpleStyle: true,
-                appliedStyle: { ...oneStyle.declarations }
+                appliedStyle: { ...oneStyle.declarations },
             });
         } else {
             switch (selector[2].trim()) {
@@ -47,28 +47,28 @@ module.exports = function (html, css) {
                     setOfSelectors[selector[1]].push({
                         isInheritable: true,
                         appliedTag: selector[3],
-                        appliedStyle: { ...oneStyle.declarations }
+                        appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
                 case ">":
                     setOfSelectors[selector[1]].push({
                         isOnceInheritable: true,
                         appliedTag: selector[3],
-                        appliedStyle: { ...oneStyle.declarations }
-                    });
-                    break;
-                case "~":
-                    setOfSelectors[selector[1]].push({
-                        isIntimate: true,
-                        appliedTag: selector[3],
-                        appliedStyle: { ...oneStyle.declarations }
+                        appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
                 case "+":
                     setOfSelectors[selector[1]].push({
+                        isIntimate: true,
+                        appliedTag: selector[3],
+                        appliedStyle: { ...oneStyle.declarations },
+                    });
+                    break;
+                case "~":
+                    setOfSelectors[selector[1]].push({
                         isNeighbor: true,
                         appliedTag: selector[3],
-                        appliedStyle: { ...oneStyle.declarations }
+                        appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
             }
