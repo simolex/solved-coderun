@@ -90,19 +90,24 @@ module.exports = function (html, css) {
                 }
             });
 
+            const newDelayedStyles = [];
+
             currentStyles.forEach((style) => {
                 if (style.isSimpleStyle) {
                     currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
                 }
                 if (style.isInheritable || style.isOnceInheritable) {
-                    delayedStyles.push(style);
+                    newDelayedStyles.push(style);
                 }
             });
             root.styles = currentAppliedStyles;
 
             root.children.forEach((child) => {
                 if (child.type === "ELEMENT") {
-                    dfsHtml(child, currentAppliedStyles, delayedStyles);
+                    dfsHtml(child, currentAppliedStyles, {
+                        ...delayedStyles.filter((style) => !style.isOnceInheritable),
+                        ...newDelayedStyles
+                    });
                 }
             });
         }
