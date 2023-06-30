@@ -262,13 +262,24 @@ const htmlSet3 = {
             children: [
                 {
                     type: "TEXT",
-                    text: "TEXT",
+                    text: "text",
                 },
             ],
         },
         {
             type: "TEXT",
-            text: "\n    ",
+            text: "\n",
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag1",
+            styles: {},
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text1",
+                },
+            ],
         },
         {
             type: "ELEMENT",
@@ -277,35 +288,20 @@ const htmlSet3 = {
             children: [
                 {
                     type: "TEXT",
-                    text: "TEXT",
+                    text: "text2",
                 },
             ],
-        },
-        {
-            type: "TEXT",
-            text: "\n    ",
         },
         {
             type: "ELEMENT",
-            tag: "tag",
+            tag: "tag2",
             styles: {},
             children: [
                 {
-                    type: "ELEMENT",
-                    tag: "tag2",
-                    styles: {},
-                    children: [
-                        {
-                            type: "TEXT",
-                            text: "TEXT",
-                        },
-                    ],
+                    type: "TEXT",
+                    text: "text2",
                 },
             ],
-        },
-        {
-            type: "TEXT",
-            text: "\n",
         },
     ],
 };
@@ -333,7 +329,7 @@ const cssSet3 = [
         },
     },
     {
-        selector: "tag    tag2",
+        selector: "tag tag2",
         declarations: {
             color: "rgb(0, 0, 255)",
             "text-align": "right",
@@ -347,17 +343,15 @@ const cssSet3 = [
         },
     },
     {
-        selector: "tag +tag2",
+        selector: "tag1 +tag2",
         declarations: {
-            color: "rgb(0, 0, 255)",
-            "text-align": "right",
+            color: "rgb(255, 0, 255)",
         },
     },
     {
-        selector: "tag~ tag2",
+        selector: "tag1~ tag2",
         declarations: {
-            color: "rgb(0, 0, 255)",
-            "text-align": "right",
+            "font-weight": "bold",
         },
     },
 ];
@@ -365,11 +359,7 @@ const cssSet3 = [
 const resultSet3 = {
     type: "ELEMENT",
     tag: "parent",
-    styles: {
-        color: "rgb(0, 0, 0)",
-        "text-align": "left",
-        "font-size": "16px",
-    },
+    styles: { color: "rgb(0, 0, 0)", "text-align": "left", "font-size": "16px" },
     children: [
         {
             type: "TEXT",
@@ -378,70 +368,60 @@ const resultSet3 = {
         {
             type: "ELEMENT",
             tag: "tag",
-            styles: {
-                color: "rgb(0, 255, 0)",
-                "text-align": "left",
-                "font-size": "13px",
-            },
+            styles: { color: "rgb(0, 255, 0)", "text-align": "left", "font-size": "13px" },
             children: [
                 {
                     type: "TEXT",
-                    text: "TEXT",
-                },
-            ],
-        },
-        {
-            type: "TEXT",
-            text: "\n    ",
-        },
-        {
-            type: "ELEMENT",
-            tag: "tag2",
-            styles: {
-                color: "rgb(0, 0, 255)",
-                "text-align": "right",
-                "font-size": "16px",
-            },
-            children: [
-                {
-                    type: "TEXT",
-                    text: "TEXT",
-                },
-            ],
-        },
-        {
-            type: "TEXT",
-            text: "\n    ",
-        },
-        {
-            type: "ELEMENT",
-            tag: "tag",
-            styles: {
-                color: "rgb(0, 255, 0)",
-                "text-align": "left",
-                "font-size": "13px",
-            },
-            children: [
-                {
-                    type: "ELEMENT",
-                    tag: "tag2",
-                    styles: {
-                        color: "rgb(0, 0, 255)",
-                        "text-align": "right",
-                        "font-size": "13px",
-                    },
-                    children: [
-                        {
-                            type: "TEXT",
-                            text: "TEXT",
-                        },
-                    ],
+                    text: "text",
                 },
             ],
         },
         {
             type: "TEXT",
             text: "\n",
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag1",
+            styles: { color: "rgb(0, 0, 0)", "text-align": "left", "font-size": "16px" },
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text1",
+                },
+            ],
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag2",
+            styles: {
+                "font-size": "16px",
+                color: "rgb(255, 0, 255)",
+                "text-align": "right",
+                "font-weight": "bold",
+            },
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text2",
+                },
+            ],
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag2",
+            styles: {
+                "font-size": "16px",
+                color: "rgb(0, 0, 0)",
+                "text-align": "right",
+                "font-weight": "bold",
+            },
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text2",
+                },
+            ],
         },
     ],
 };

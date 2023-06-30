@@ -33,8 +33,8 @@ module.exports = function (html, css) {
 
     const regSelector = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
     for (const oneStyle of css) {
-        // console.log(re.exec(oneStyle.selector.split(" ").filter(Boolean).join(" ")));
         const selector = regSelector.exec(oneStyle.selector.split(" ").filter(Boolean).join(" "));
+        if (selector === null) continue;
         if (selector[3] === undefined) {
             if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
             setOfSelectors[selector[1]].push({
@@ -44,6 +44,8 @@ module.exports = function (html, css) {
         } else {
             switch (selector[2].trim()) {
                 case "":
+                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+
                     setOfSelectors[selector[1]].push({
                         isInheritable: true,
                         appliedTag: selector[3].trim(),
@@ -51,6 +53,8 @@ module.exports = function (html, css) {
                     });
                     break;
                 case ">":
+                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+
                     setOfSelectors[selector[1]].push({
                         isOnceInheritable: true,
                         appliedTag: selector[3].trim(),
@@ -58,6 +62,7 @@ module.exports = function (html, css) {
                     });
                     break;
                 case "+":
+                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
                     setOfSelectors[selector[1]].push({
                         isIntimate: true,
                         appliedTag: selector[3].trim(),
@@ -65,6 +70,8 @@ module.exports = function (html, css) {
                     });
                     break;
                 case "~":
+                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+
                     setOfSelectors[selector[1]].push({
                         isNeighbor: true,
                         appliedTag: selector[3].trim(),
@@ -81,7 +88,8 @@ module.exports = function (html, css) {
 
     const dfsHtml = (root, level, defaultStyles = {}, delayedStyles = []) => {
         if (root.type === "ELEMENT") {
-            const currentStyles = setOfSelectors[root.tag.trim()] ?? {};
+            const currentStyles = setOfSelectors[root.tag.trim()];
+            if (!currentStyles) currentStyles = [];
             let currentAppliedStyles = defaultStyles;
 
             const newDelayedStyles = [];
@@ -128,20 +136,16 @@ module.exports = function (html, css) {
                     } else {
                         intimate = undefined;
                     }
-                    dfsHtml(child, level + 1, currentAppliedStyles, {
+                    dfsHtml(child, level + 1, currentAppliedStyles, [
                         ...delayedStyles.filter((style) => style.isInheritable),
                         ...newDelayedStyles,
                         ...oneLevelStyles,
-                    });
+                    ]);
                 }
             });
         }
     };
 
     dfsHtml(html, 0);
-
-    //console.log([{ steps: 1 }].reduce((s, e) => ({ ...s, ...e }), { init: 1 }));
-    console.log(html);
-
     return html;
 };
