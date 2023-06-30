@@ -46,28 +46,28 @@ module.exports = function (html, css) {
                 case "":
                     setOfSelectors[selector[1]].push({
                         isInheritable: true,
-                        appliedTag: selector[3],
+                        appliedTag: selector[3].trim(),
                         appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
                 case ">":
                     setOfSelectors[selector[1]].push({
                         isOnceInheritable: true,
-                        appliedTag: selector[3],
+                        appliedTag: selector[3].trim(),
                         appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
                 case "+":
                     setOfSelectors[selector[1]].push({
                         isIntimate: true,
-                        appliedTag: selector[3],
+                        appliedTag: selector[3].trim(),
                         appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
                 case "~":
                     setOfSelectors[selector[1]].push({
                         isNeighbor: true,
-                        appliedTag: selector[3],
+                        appliedTag: selector[3].trim(),
                         appliedStyle: { ...oneStyle.declarations },
                     });
                     break;
@@ -79,6 +79,69 @@ module.exports = function (html, css) {
         setOfSelectors[key];
     }
 
-    const dfsHtml = (root, fnNode) => {};
-    return "";
+    const dfsHtml = (root, level, defaultStyles = {}, delayedStyles = []) => {
+        if (root.type === "ELEMENT") {
+            const currentStyles = setOfSelectors[root.tag.trim()] ?? {};
+            let currentAppliedStyles = defaultStyles;
+
+            const newDelayedStyles = [];
+
+            currentStyles.forEach((style) => {
+                if (style.isSimpleStyle) {
+                    currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
+                }
+                if (style.isInheritable || style.isOnceInheritable) {
+                    newDelayedStyles.push({ ...style, initLevel: level });
+                }
+            });
+
+            delayedStyles.forEach((style) => {
+                if (root.tag.trim() === style.appliedTag) {
+                    //if (style.isInheritable || (style.isOnceInheritable && initLevel === level + 1))
+                    currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
+                }
+            });
+
+            root.styles = currentAppliedStyles;
+            const neighbors = [];
+            let intimate = undefined;
+            root.children.forEach((child) => {
+                if (child.type === "ELEMENT") {
+                    const oneLevelStyles = [];
+                    const getedTag = setOfSelectors[child.tag.trim()];
+
+                    neighbors.forEach((item) => {
+                        if (item.appliedTag === child.tag.trim()) {
+                            oneLevelStyles.push(item);
+                        }
+                    });
+                    if (getedTag && getedTag.isNeighbor) {
+                        neighbors.push(getedTag);
+                    }
+
+                    if (intimate && intimate.appliedTag === child.tag.trim()) {
+                        oneLevelStyles.push(intimate);
+                        intimate = undefined;
+                    }
+                    if (getedTag && getedTag.isIntimate) {
+                        intimate = getedTag;
+                    } else {
+                        intimate = undefined;
+                    }
+                    dfsHtml(child, level + 1, currentAppliedStyles, {
+                        ...delayedStyles.filter((style) => style.isInheritable),
+                        ...newDelayedStyles,
+                        ...oneLevelStyles,
+                    });
+                }
+            });
+        }
+    };
+
+    dfsHtml(html, 0);
+
+    //console.log([{ steps: 1 }].reduce((s, e) => ({ ...s, ...e }), { init: 1 }));
+    console.log(html);
+
+    return html;
 };
