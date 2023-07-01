@@ -32,58 +32,62 @@ module.exports = function (html, css) {
     const setOfSelectors = {};
 
     const regSelector = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
-    for (const oneStyle of css) {
+    for (const [idxStyle, oneStyle] of css.entries()) {
         const selector = regSelector.exec(oneStyle.selector.split(" ").filter(Boolean).join(" "));
-        if (selector === null) continue;
+        if (selector === null || !selector[1] || selector[1].length === 0) continue;
         if (selector[3] === undefined) {
-            if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-            setOfSelectors[selector[1]].push({
-                isSimpleStyle: true,
-                appliedStyle: { ...oneStyle.declarations },
-            });
+            if (selector[1] && selector[1].length > 0) {
+                if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+                setOfSelectors[selector[1]].push({
+                    isSimpleStyle: true,
+                    idxStyle,
+                    appliedStyle: { ...oneStyle.declarations }
+                });
+            }
         } else {
-            switch (selector[2].trim()) {
-                case "":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+            if (selector[1] && selector[1].length > 0) {
+                switch (selector[2] && selector[2].trim()) {
+                    case "":
+                        if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
 
-                    setOfSelectors[selector[1]].push({
-                        isInheritable: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
-                    break;
-                case ">":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+                        setOfSelectors[selector[1]].push({
+                            isInheritable: true,
+                            idxStyle,
+                            appliedTag: selector[3].trim(),
+                            appliedStyle: { ...oneStyle.declarations }
+                        });
+                        break;
+                    case ">":
+                        if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
 
-                    setOfSelectors[selector[1]].push({
-                        isOnceInheritable: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
-                    break;
-                case "+":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-                    setOfSelectors[selector[1]].push({
-                        isIntimate: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
-                    break;
-                case "~":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+                        setOfSelectors[selector[1]].push({
+                            isOnceInheritable: true,
+                            idxStyle,
+                            appliedTag: selector[3].trim(),
+                            appliedStyle: { ...oneStyle.declarations }
+                        });
+                        break;
+                    case "+":
+                        if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+                        setOfSelectors[selector[1]].push({
+                            isIntimate: true,
+                            idxStyle,
+                            appliedTag: selector[3].trim(),
+                            appliedStyle: { ...oneStyle.declarations }
+                        });
+                        break;
+                    case "~":
+                        if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
 
-                    setOfSelectors[selector[1]].push({
-                        isNeighbor: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
-                    break;
+                        setOfSelectors[selector[1]].push({
+                            isNeighbor: true,
+                            appliedTag: selector[3].trim(),
+                            appliedStyle: { ...oneStyle.declarations }
+                        });
+                        break;
+                }
             }
         }
-    }
-
-    for (const key in setOfSelectors) {
-        setOfSelectors[key];
     }
 
     const dfsHtml = (root, level, defaultStyles = {}, delayedStyles = []) => {
@@ -105,7 +109,6 @@ module.exports = function (html, css) {
 
             delayedStyles.forEach((style) => {
                 if (root.tag.trim() === style.appliedTag) {
-                    //if (style.isInheritable || (style.isOnceInheritable && initLevel === level + 1))
                     currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
                 }
             });
@@ -116,30 +119,31 @@ module.exports = function (html, css) {
             root.children.forEach((child) => {
                 if (child.type === "ELEMENT") {
                     const oneLevelStyles = [];
-                    const getedTag = setOfSelectors[child.tag.trim()];
+                    //const getedTag = setOfSelectors[child.tag.trim()];
 
-                    neighbors.forEach((item) => {
-                        if (item.appliedTag === child.tag.trim()) {
-                            oneLevelStyles.push(item);
-                        }
-                    });
-                    if (getedTag && getedTag.isNeighbor) {
-                        neighbors.push(getedTag);
-                    }
+                    // neighbors.forEach((item) => {
+                    //     if (item.appliedTag === child.tag.trim()) {
+                    //         oneLevelStyles.push(item);
+                    //     }
+                    // });
+                    // if (getedTag && getedTag.isNeighbor) {
+                    //     neighbors.push(getedTag);
+                    //     0;
+                    // }
 
-                    if (intimate && intimate.appliedTag === child.tag.trim()) {
-                        oneLevelStyles.push(intimate);
-                        intimate = undefined;
-                    }
-                    if (getedTag && getedTag.isIntimate) {
-                        intimate = getedTag;
-                    } else {
-                        intimate = undefined;
-                    }
+                    // if (intimate && intimate.appliedTag === child.tag.trim()) {
+                    //     oneLevelStyles.push(intimate);
+                    //     intimate = undefined;
+                    // }
+                    // if (getedTag && getedTag.isIntimate) {
+                    //     intimate = getedTag;
+                    // } else {
+                    //     intimate = undefined;
+                    // }
                     dfsHtml(child, level + 1, currentAppliedStyles, [
                         ...delayedStyles.filter((style) => style.isInheritable),
                         ...newDelayedStyles,
-                        ...oneLevelStyles,
+                        ...oneLevelStyles
                     ]);
                 }
             });
