@@ -1,4 +1,4 @@
-const setStyles = require("./index2");
+const setStyles = require("./index-bad");
 
 const htmlSet1 = {
     type: "ELEMENT",
@@ -283,7 +283,18 @@ const htmlSet3 = {
         },
         {
             type: "ELEMENT",
-            tag: "tag",
+            tag: "tag2",
+            styles: {},
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text2"
+                }
+            ]
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag2",
             styles: {},
             children: [
                 {
@@ -318,9 +329,29 @@ const cssSet3 = [
         }
     },
     {
-        selector: "parent tag",
+        selector: "tag tag2",
         declarations: {
-            "text-align": "center"
+            color: "rgb(0, 0, 255)",
+            "text-align": "right"
+        }
+    },
+    {
+        selector: "tag>tag2",
+        declarations: {
+            color: "rgb(0, 0, 255)",
+            "text-align": "right"
+        }
+    },
+    {
+        selector: "tag1 +tag2",
+        declarations: {
+            color: "rgb(255, 0, 255)"
+        }
+    },
+    {
+        selector: "tag1~ tag2",
+        declarations: {
+            "font-weight": "bold"
         }
     }
 ];
@@ -337,7 +368,7 @@ const resultSet3 = {
         {
             type: "ELEMENT",
             tag: "tag",
-            styles: { color: "rgb(0, 255, 0)", "text-align": "center", "font-size": "13px" },
+            styles: { color: "rgb(0, 255, 0)", "text-align": "left", "font-size": "13px" },
             children: [
                 {
                     type: "TEXT",
@@ -362,8 +393,29 @@ const resultSet3 = {
         },
         {
             type: "ELEMENT",
-            tag: "tag",
-            styles: { color: "rgb(0, 255, 0)", "text-align": "center", "font-size": "13px" },
+            tag: "tag2",
+            styles: {
+                "font-size": "16px",
+                color: "rgb(255, 0, 255)",
+                "text-align": "right",
+                "font-weight": "bold"
+            },
+            children: [
+                {
+                    type: "TEXT",
+                    text: "text2"
+                }
+            ]
+        },
+        {
+            type: "ELEMENT",
+            tag: "tag2",
+            styles: {
+                "font-size": "16px",
+                color: "rgb(0, 0, 0)",
+                "text-align": "right",
+                "font-weight": "bold"
+            },
             children: [
                 {
                     type: "TEXT",
@@ -385,7 +437,7 @@ describe("365. Apply styles", () => {
     //     expect(result).toEqual(resultSet2);
     // });
 
-    test("test-3 (space)", () => {
+    test("test-3", () => {
         const result = setStyles(htmlSet3, cssSet3);
         expect(result).toEqual(resultSet3);
     });

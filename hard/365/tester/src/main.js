@@ -1,126 +1,111 @@
 // Не забудьте перед отправкой изменить в module.exports = function(html, css) {
+const applyForAllNodes = (node, fn, parentStyle, delayedStyles, info) => {
+    if (node.type === "ELEMENT") {
+        const newCss = fn(node, parentStyle, delayedStyles, info);
+
+        const level = info.level + 1;
+        let pos = 0;
+        node.children.forEach((child) => {
+            if (child.type === "ELEMENT") {
+                applyForAllNodes(child, fn, newCss, delayedStyles, { level, pos });
+                pos++;
+            }
+        });
+    }
+};
+
+const combinator = "[ \\~\\+\\>]+";
+
+const getSelector = (cssRule) => {
+    if (!cssRule.selector) return;
+
+    const cleanCssRule = cssRule.selector.trim();
+    const reCombinator = new RegExp(combinator, "i");
+    const selectorRule = {};
+    if (reCombinator.test(cleanCssRule)) {
+        const resultCombinator = reCombinator.exec(cleanCssRule);
+        selectorRule.first = cleanCssRule.substring(0, resultCombinator.index);
+        selectorRule.second = cleanCssRule.substring(resultCombinator.index + resultCombinator[0].length);
+
+        switch (resultCombinator[0].trim()) {
+            case "":
+                selectorRule.type = "inherit";
+                break;
+            case ">":
+                selectorRule.type = "child";
+                break;
+            case "~":
+                selectorRule.type = "neighbor";
+                break;
+            case "+":
+                selectorRule.type = "intimate";
+                break;
+        }
+    } else {
+        selectorRule.type = "single";
+        selectorRule.first = cleanCssRule;
+    }
+    return selectorRule;
+};
+
 export default function (html, css) {
-    const oneTagPattern = "([^\\s\\~\\+\\>]+)";
-    // const comboSymbolPattern = "(?:(?<![>~\\+])(\\s+)(?![>~\\+])|(?:\\s*([>~\\+])\\s*))";
-    const comboSymbolPattern = "((?<![>~\\+])\\s?[>~\\+]?)\\s*";
-    const setOfSelectors = {};
+    for (const [indexStyle, itemStyle] of css.entries()) {
+        css[indexStyle].selectorRule = getSelector(itemStyle);
+        // css[indexStyle].selectorRule.indexStyle = indexStyle;
+    }
 
-    const regSelector = RegExp(`^${oneTagPattern}${comboSymbolPattern}?${oneTagPattern}?$`);
-    for (const oneStyle of css) {
-        // console.log(re.exec(oneStyle.selector.split(" ").filter(Boolean).join(" ")));
-        const selector = regSelector.exec(oneStyle.selector.split(" ").filter(Boolean).join(" "));
-        if (selector[3] === undefined) {
-            if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-            setOfSelectors[selector[1]].push({
-                isSimpleStyle: true,
-                appliedStyle: { ...oneStyle.declarations },
-            });
-        } else {
-            switch (selector[2].trim()) {
-                case "":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
+    const singleCssRules = css.filter((rule) => rule.selectorRule.type === "single");
+    const otherCssRules = css.filter((rule) => rule.selectorRule.type !== "single");
 
-                    setOfSelectors[selector[1]].push({
-                        isInheritable: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
+    const applySingleRule = (node, parentStyle = {}) => {
+        const currentRule = singleCssRules.find((rule) => rule.selectorRule.first === node.tag);
+        let newStyle = {};
+        if (currentRule) {
+            newStyle = currentRule.declarations;
+        }
+        node.styles = { ...parentStyle, ...newStyle }; //{ ...node.styles, ...parentStyle, ...currentRule.declarations };
+
+        return { ...parentStyle, ...newStyle };
+    };
+    applyForAllNodes(html, applySingleRule, {}, [], { level: 0, pos: 0 });
+
+    let currentIndex = 0;
+    const applyCombinedRule = (node, parentStyle = {}, delayedStyles = [], info) => {
+        const currentRule = otherCssRules[currentIndex];
+        if (currentRule.selectorRule.first === node.tag) {
+            let testRule;
+
+            switch (currentRule.selectorRule.type) {
+                case "inherit":
+                    testRule = (testedInfo) => testedInfo.level > info.level;
                     break;
-                case ">":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-
-                    setOfSelectors[selector[1]].push({
-                        isOnceInheritable: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
+                case "child":
+                    testRule = (testedInfo) => testedInfo.level === info.level + 1;
                     break;
-                case "+":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-                    setOfSelectors[selector[1]].push({
-                        isIntimate: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
+                case "neighbor":
+                    testRule = (testedInfo) => testedInfo.level === info.level && testedInfo.pos > info.pos;
                     break;
-                case "~":
-                    if (!setOfSelectors[selector[1]]) setOfSelectors[selector[1]] = [];
-
-                    setOfSelectors[selector[1]].push({
-                        isNeighbor: true,
-                        appliedTag: selector[3].trim(),
-                        appliedStyle: { ...oneStyle.declarations },
-                    });
+                case "intimate":
+                    testRule = (testedInfo) => testedInfo.level === info.level && testedInfo.pos > info.pos + 1;
                     break;
             }
+            delayedStyles.push(testRule);
         }
-    }
 
-    for (const key in setOfSelectors) {
-        setOfSelectors[key];
-    }
-
-    const dfsHtml = (root, level, defaultStyles = {}, delayedStyles = []) => {
-        if (root.type === "ELEMENT") {
-            const currentStyles = setOfSelectors[root.tag.trim()];
-            if (!currentStyles) currentStyles = [];
-            let currentAppliedStyles = defaultStyles;
-
-            const newDelayedStyles = [];
-
-            currentStyles.forEach((style) => {
-                if (style.isSimpleStyle) {
-                    currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
-                }
-                if (style.isInheritable || style.isOnceInheritable) {
-                    newDelayedStyles.push({ ...style, initLevel: level });
-                }
-            });
-
-            delayedStyles.forEach((style) => {
-                if (root.tag.trim() === style.appliedTag) {
-                    //if (style.isInheritable || (style.isOnceInheritable && initLevel === level + 1))
-                    currentAppliedStyles = { ...currentAppliedStyles, ...style.appliedStyle };
-                }
-            });
-
-            root.styles = currentAppliedStyles;
-            const neighbors = [];
-            let intimate = undefined;
-            root.children.forEach((child) => {
-                if (child.type === "ELEMENT") {
-                    const oneLevelStyles = [];
-                    const getedTag = setOfSelectors[child.tag.trim()];
-
-                    neighbors.forEach((item) => {
-                        if (item.appliedTag === child.tag.trim()) {
-                            oneLevelStyles.push(item);
-                        }
-                    });
-                    if (getedTag && getedTag.isNeighbor) {
-                        neighbors.push(getedTag);
-                    }
-
-                    if (intimate && intimate.appliedTag === child.tag.trim()) {
-                        oneLevelStyles.push(intimate);
-                        intimate = undefined;
-                    }
-                    if (getedTag && getedTag.isIntimate) {
-                        intimate = getedTag;
-                    } else {
-                        intimate = undefined;
-                    }
-                    dfsHtml(child, level + 1, currentAppliedStyles, [
-                        ...delayedStyles.filter((style) => style.isInheritable),
-                        ...newDelayedStyles,
-                        ...oneLevelStyles,
-                    ]);
-                }
-            });
+        let currentStyle = {};
+        if (currentRule.selectorRule.second === node.tag && delayedStyles.some((testStyle) => testStyle(info))) {
+            currentStyle = currentRule.declarations;
         }
+
+        node.styles = { ...node.styles, ...parentStyle, ...currentStyle };
+        return { ...parentStyle, ...currentStyle };
     };
 
-    dfsHtml(html, 0);
-
+    for (currentIndex = 0; currentIndex < otherCssRules.length; currentIndex++) {
+        const ds = [];
+        applyForAllNodes(html, applyCombinedRule, {}, ds, { level: 0, pos: 0 });
+        //console.log(ds);
+    }
+    // console.log(html);
     return html;
 }
