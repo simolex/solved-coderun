@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path')
-const solution = require('./solution');
+const fs = require("fs");
+const path = require("path");
+const solution = require("./solution/index.js");
 
-const INPUT_PATH = path.resolve(__dirname, './input/input.json');
-const OUTPUT_PATH = path.resolve(__dirname, './output/output.html');
+const INPUT_PATH = path.resolve(__dirname, "./input/input.json");
+const OUTPUT_PATH = path.resolve(__dirname, "./output/output.html");
 
-const json = JSON.parse(fs.readFileSync(INPUT_PATH, { encoding: 'utf-8' }));
+const json = JSON.parse(fs.readFileSync(INPUT_PATH, { encoding: "utf-8" }));
 
 const html = `
     <!DOCTYPE html>
@@ -19,4 +19,4 @@ const html = `
     </html>
 `;
 
-fs.writeFileSync(OUTPUT_PATH, html, { encoding: 'utf-8' });
+fs.writeFileSync(OUTPUT_PATH, html, { encoding: "utf-8" });
