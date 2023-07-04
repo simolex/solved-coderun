@@ -1,28 +1,52 @@
+const axisAlign = {
+    CENTER: "center",
+    SPACE_BETWEEN: "space-between",
+};
+
 const sizeOrZero = (value) => (value ? `${value}px` : "0");
 const flexDirection = (value) => (value === "VERTICAL" ? "column" : "row");
 
 const floatToByte = (value) => Math.round(value * 255);
 
-const rgbToHex = (color) => {
-    if (color.length === 0) return "inherit";
+const rgbToHex = (colorObj) => {
+    if (!colorObj.color) return "inherit";
 
-    const { r, g, b, a = 1 } = color[color.length - 1].color;
+    const { r, g, b, a = 1 } = colorObj.color;
     if (floatToByte(a) === 255) {
         return (
-            "#" + ((1 << 24) | (floatToByte(r) << 16) | (floatToByte(g) << 8) | floatToByte(b)).toString(16).slice(1)
+            "#" +
+            ((1 << 24) | (floatToByte(r) << 16) | (floatToByte(g) << 8) | floatToByte(b))
+                .toString(16)
+                .slice(1)
         );
     } else {
         return (
             "#" +
-            ((1 << 36) | (floatToByte(r) << 24) | (floatToByte(g) << 16) | (floatToByte(b) << 8) | floatToByte(a))
+            (
+                (1 << 36) |
+                (floatToByte(r) << 24) |
+                (floatToByte(g) << 16) |
+                (floatToByte(b) << 8) |
+                floatToByte(a)
+            )
                 .toString(16)
                 .slice(1)
         );
     }
 };
-const axisAlign = {
-    CENTER: "center",
-    SPACE_BETWEEN: "space-between"
+
+const getEffectStyles = (effectList) => {
+    return effectList.reduce((code, effect) => {
+        const color = ` ${effect.color && rgbToHex(effect)}`;
+        const offset = ` ${sizeOrZero(effect.offset.x)} ${sizeOrZero(effect.offset.y)}`;
+        const radius = ` ${effect.radius !== undefined ? sizeOrZero(effect.radius) : ""}`;
+        const spread = ` ${effect.spread !== undefined ? sizeOrZero(effect.spread) : ""}`;
+
+        switch (effect.type) {
+            case "DROP_SHADOW":
+                return `${code} box-shadow:${offset}${radius}${spread}${color};`;
+        }
+    }, "");
 };
 
 const TEXT_STYLES_MAPPER = {
@@ -30,7 +54,13 @@ const TEXT_STYLES_MAPPER = {
     fontSize: (value) => `font-size: ${value}px;`,
     fontWeight: (value) => `font-weight: ${value};`,
     textAlignHorizontal: (value) => `text-align: ${value.toLowerCase()};`,
-    lineHeightPercent: (value) => `line-height: ${value}%;`
+    lineHeightPx: (value) => `line-height: ${Math.round(value)}px;`,
+};
+
+const IMAGE_STYLES_MAPPER = {
+    absoluteBoundingBox: (box) =>
+        `width: ${sizeOrZero(box.width)}; height: ${sizeOrZero(box.height)};`,
+    fills: (color) => `background-color: ${color[0] && rgbToHex(color[0])};`,
 };
 
 const FRAME_STYLES_MAPPER = {
@@ -43,23 +73,55 @@ const FRAME_STYLES_MAPPER = {
     counterAxisAlignItems: (value) => `align-items: ${axisAlign[value]};`,
     primaryAxisAlignItems: (value) => `justify-content: ${axisAlign[value]};`,
 
-    absoluteBoundingBox: (box) => `width: ${sizeOrZero(box.width)}; height: ${sizeOrZero(box.height)};`,
+    absoluteBoundingBox: (box) =>
+        `width: ${sizeOrZero(box.width)}; height: ${sizeOrZero(box.height)};`,
     itemSpacing: (value) => `gap: ${value}px;`,
-    background: (color) => `background-color: ${rgbToHex(color)};`,
-    fills: (color) => `color: ${rgbToHex(color)};`
+    background: (color) => `background-color: ${color[0] && rgbToHex(color[0])};`,
+    fills: (color) => `color: ${color[0] && rgbToHex(color[0])};`,
+    effects: (list) => getEffectStyles(list),
+    strokes: (list) => {
+        if (list.length > 0) {
+            const color = rgbToHex(list[0]);
+            const type = list[0].type.toLowerCase();
+            return (value) => `border: ${value} ${type} ${color};`;
+        } else {
+            return (value) => "";
+        }
+    },
+    strokeWeight: (value) => sizeOrZero(value),
 };
 
 const buildBlock = ({ type, content, className, style }) => {
     return `<${type} class="${className}" style="${style}">${content}</${type}>`;
 };
 
+const getRectangleStyles = (node) => {
+    const styleArr = [];
+    if (node) {
+        for (let [key, value] of Object.entries(node)) {
+            if (IMAGE_STYLES_MAPPER[key]) {
+                styleArr.push(IMAGE_STYLES_MAPPER[key](value));
+            }
+        }
+    }
+    return styleArr.join(" ");
+};
+
 const getStyles = (node) => {
     const styleArr = [];
     if (node) {
         for (let [key, value] of Object.entries(node)) {
+            if (key === "strokes" || key === "strokeWeight") continue;
             if (FRAME_STYLES_MAPPER[key]) {
                 styleArr.push(FRAME_STYLES_MAPPER[key](value));
             }
+        }
+        if (node.strokes.length > 0) {
+            styleArr.push(
+                FRAME_STYLES_MAPPER.strokes(node.strokes)(
+                    FRAME_STYLES_MAPPER.strokeWeight(node.strokeWeight)
+                )
+            );
         }
     }
     if (node.style) {
@@ -78,7 +140,7 @@ const PRIMITIVES = {
             type: "span",
             content: node.characters,
             className: node.type,
-            style: getStyles(node)
+            style: getStyles(node),
         });
     },
     DEFAULT: (node, childs) => {
@@ -86,7 +148,7 @@ const PRIMITIVES = {
             type: "div",
             content: childs,
             className: node.name,
-            style: ""
+            style: "",
         });
     },
     FRAME: (node, childs) => {
@@ -94,7 +156,7 @@ const PRIMITIVES = {
             type: "div",
             content: childs,
             className: node.name,
-            style: getStyles(node)
+            style: getStyles(node),
         });
     },
     INSTANCE: (node, childs) => {
@@ -102,9 +164,17 @@ const PRIMITIVES = {
             type: "div",
             content: childs,
             className: node.name,
-            style: getStyles(node)
+            style: getStyles(node),
         });
-    }
+    },
+    RECTANGLE: (node, childs) => {
+        return buildBlock({
+            type: "div",
+            content: "",
+            className: node.name,
+            style: getRectangleStyles(node),
+        });
+    },
 };
 
 const parse = (entry) => {
@@ -127,5 +197,13 @@ const traverse = (node) => {
 
 module.exports = function (json) {
     const entry = json.document.children[0];
-    return parse(entry);
+    return (
+        `
+    <style>
+    * {
+      box-sizing: border-box;
+    }
+    </style>
+    ` + parse(entry)
+    );
 };

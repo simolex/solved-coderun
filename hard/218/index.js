@@ -45,13 +45,12 @@ module.exports = function (mapString) {
             dots[dotKey].nextTik = dots[dotKey].saveCurrentTik;
             dots[dotKey].nextTik.count = 0;
 
-            //let findedLetter = false;
             for (let i = 0; i < dots[dotKey].currentTik.count; i++) {
                 const { x: currentX, y: currentY } = dots[dotKey].currentTik.buffer[i];
                 const ch = map[currentY][currentX].charCodeAt(0);
 
                 if (ch >= 65 && ch <= 90) {
-                    maxTik = tik; // findedLetter = true;
+                    maxTik = tik;
                 }
                 directions.forEach(([dx, dy]) => {
                     const x = currentX + dx;
@@ -65,15 +64,13 @@ module.exports = function (mapString) {
                         dots[dotKey].nextTik.count++;
                     }
                 });
-                //markVisited(currentX, currentY);
                 map[currentY][currentX] = "~";
             }
-            // if (findedLetter) maxTik = tik; //Math.max(maxTik, tik);
             if (dots[dotKey].nextTik.count === 0) {
                 dots[dotKey].isEmpty = true;
                 dotsCount--;
             }
         }
     }
-    return maxTik; //timeInSec; // Время в секундах, за которое все буквы вытекли
+    return maxTik;
 };
