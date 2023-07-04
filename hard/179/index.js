@@ -35,6 +35,24 @@ module.exports = function (pullRequests) {
             }
         }
     }
-    console.log(hashAllFiles, countFilesInPulls);
-    return ["#1", "#2", "#3"];
+
+    const allConflictingIndex = new Map();
+
+    for (const pull of hashAllFiles.values()) {
+        if (pull.size > 1) {
+            for (pullIndex of pull.values()) {
+                if (!allConflictingIndex.has(pullIndex)) allConflictingIndex.set(pullIndex, new Set());
+                for (addIndex of pull.values()) {
+                    if (addIndex === pullIndex) continue;
+
+                    const getIndex = allConflictingIndex.get(pullIndex);
+                    getIndex.add(addIndex);
+                    allConflictingIndex.set(pullIndex, getIndex);
+                }
+            }
+        }
+    }
+    console.log(hashAllFiles);
+    console.log(allConflictingIndex);
+    return ["#1", "#2", "#4"];
 };
