@@ -17,7 +17,6 @@
  * @returns {string[]} идентификаторы реквестов в порядке мёржа
  */
 module.exports = function (pullRequests) {
-    const dissidents = [];
     const hashAllFiles = new Map();
     const countFilesInPulls = [];
 
@@ -41,8 +40,7 @@ module.exports = function (pullRequests) {
     for (const pull of hashAllFiles.values()) {
         if (pull.size > 1) {
             for (pullIndex of pull.values()) {
-                if (!allConflictingIndex.has(pullIndex))
-                    allConflictingIndex.set(pullIndex, new Set());
+                if (!allConflictingIndex.has(pullIndex)) allConflictingIndex.set(pullIndex, new Set());
                 for (addIndex of pull.values()) {
                     if (addIndex === pullIndex) continue;
 
@@ -51,11 +49,13 @@ module.exports = function (pullRequests) {
                     allConflictingIndex.set(pullIndex, getIndex);
                 }
             }
+        } else {
         }
     }
     const pullList = [-1];
     const ratingList = [0];
     const ratingPath = [-1];
+    let globalMaxIndex = 0;
     for (const [i, testIndex] of allConflictingIndex.entries()) {
         let currentMax = 0;
         let pathFromIndex = 0;
@@ -73,22 +73,19 @@ module.exports = function (pullRequests) {
                 pathFromIndex = slot;
             }
         }
+        if (currentMax > ratingList[globalMaxIndex]) globalMaxIndex = ratingList.length;
         pullList.push(i);
         ratingList.push(currentMax);
         ratingPath.push(pathFromIndex);
     }
 
-    /**
-     * TODO
-     * найти максимум
-     * восстановить путь
-     * отсортировать для всех результат
-     */
+    let currentPointPath = globalMaxIndex;
+    const selectedPulls = new Set();
+    while (ratingPath[currentPointPath] >= 0) {
+        selectedPulls.add(pullRequests[pullList[currentPointPath]].id);
+        allConflictingIndex.delete(pullList[currentPointPath]);
+        currentPointPath = ratingPath[currentPointPath];
+    }
 
-    console.log(hashAllFiles);
-    console.log(allConflictingIndex);
-    console.log(pullList);
-    console.log(ratingList);
-    console.log(ratingPath);
-    return ["#1", "#2", "#4"];
+    return pullRequests.filter((PullRequest, i) => !allConflictingIndex.has(i)).map((v) => v.id);
 };
