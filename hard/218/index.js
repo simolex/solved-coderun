@@ -1,30 +1,65 @@
 module.exports = function (mapString) {
-    const mapLines = mapString.split("\n");
+    const encoder = new TextEncoder();
+    const binArray = encoder.encode(mapString);
+    const lenArray = binArray.length;
 
-    const map = mapLines.reduce((mapArray, line) => {
-        mapArray.push(line.split(""));
-        return mapArray;
-    }, []);
-    const heightPot = map.length;
-    const widthPot = map[0].length;
-    const dots = {};
+    let widthPot = 0;
+    while (binArray[widthPot] !== 10 && widthPot < binArray.length) {
+        widthPot++;
+    }
+    const heightPot = Math.ceil(lenArray / (widthPot + 1));
 
-    const isNumber = (n) => !isNaN(parseFloat(n)) && !isNaN(n - 0);
+    let maskPushPointer = 0;
+    let maskShiftPointer = 0;
+    const bufferX = new ArrayBuffer(lenArray * 2);
+    const bufferY = new ArrayBuffer(lenArray * 2);
+    const maskDeckX = new Uint16Array(bufferX);
+    const maskDeckY = new Uint16Array(bufferY);
+
+    const bufferBoard = new ArrayBuffer(lenArray);
+    const maskBoard = new Uint8Array(bufferBoard);
+
+    const isNumber = (n) => n > 47 && n < 58;
+
+    const getChar = (x, y) => binArray[y * (widthPot + 1) + x];
+    const mark = (x, y) => {
+        maskBoard[y * (widthPot + 1) + x] = 1;
+    };
+    const visited = (x, y) => maskBoard[y * (widthPot + 1) + x] === 1;
 
     const createDot = (x, y) => ({
         currentTik: { buffer: [], count: 0 },
-        nextTik: { buffer: [{ x, y }], count: 1 },
+        nextTik: { buffer: [{ x, y }], count: 1 }
     });
 
     for (let i = 0; i < widthPot; i++) {
-        if (isNumber(map[0][i])) dots[map[0][i]] = createDot(i, 0);
-        if (isNumber(map[heightPot - 1][i]))
-            dots[map[heightPot - 1][i]] = createDot(i, heightPot - 1);
+        if (isNumber(getChar(i, 0))) {
+            maskDeckX[maskPushPointer] = i;
+            maskDeckY[maskPushPointer] = 0;
+            maskPushPointer++;
+            mark(i, 0);
+        }
+        if (isNumber(getChar(i, heightPot - 1))) {
+            maskDeckX[maskPushPointer] = i;
+            maskDeckY[maskPushPointer] = heightPot - 1;
+            maskPushPointer++;
+            mark(i, heightPot - 1);
+        }
     }
 
     for (let i = 0; i < heightPot; i++) {
-        if (isNumber(map[i][0])) dots[map[i][0]] = createDot(0, i);
-        if (isNumber(map[i][widthPot - 1])) dots[map[i][widthPot - 1]] = createDot(widthPot - 1, i);
+        if (isNumber(getChar(0, i))) {
+            maskDeckX[maskPushPointer] = 0;
+            maskDeckY[maskPushPointer] = i;
+            maskPushPointer++;
+            mark(0, i);
+        }
+        if (isNumber(getChar(widthPot - 1, i))) {
+            maskDeckX[maskPushPointer] = widthPot - 1;
+            maskDeckY[maskPushPointer] = i;
+            maskPushPointer++;
+            mark(widthPot - 1, i);
+        }
     }
 
     let maxTik = 1;
@@ -33,43 +68,35 @@ module.exports = function (mapString) {
         [-1, 0],
         [0, -1],
         [1, 0],
-        [0, 1],
+        [0, 1]
     ];
-    let dotsCount = Object.keys(dots).length;
-    while (dotsCount > 0) {
+
+    let tikPushPointer;
+    while (maskShiftPointer < maskPushPointer) {
         tik++;
-        for (let dotKey in dots) {
-            if (dots[dotKey].isEmpty) continue;
-            dots[dotKey].saveCurrentTik = dots[dotKey].currentTik;
-            dots[dotKey].currentTik = dots[dotKey].nextTik;
-            dots[dotKey].nextTik = dots[dotKey].saveCurrentTik;
-            dots[dotKey].nextTik.count = 0;
+        tikPushPointer = maskPushPointer;
+        while (maskShiftPointer < tikPushPointer) {
+            const currentX = maskDeckX[maskShiftPointer];
+            const currentY = maskDeckY[maskShiftPointer];
+            maskShiftPointer++;
+            const ch = getChar(currentX, currentY);
 
-            for (let i = 0; i < dots[dotKey].currentTik.count; i++) {
-                const { x: currentX, y: currentY } = dots[dotKey].currentTik.buffer[i];
-                const ch = map[currentY][currentX].charCodeAt(0);
+            if (ch >= 65 && ch <= 90) {
+                maxTik = tik;
+            }
 
-                if (ch >= 65 && ch <= 90) {
-                    maxTik = tik;
+            mark(currentX, currentY);
+
+            directions.forEach(([dx, dy]) => {
+                const x = currentX + dx;
+                const y = currentY + dy;
+                if (x >= 0 && x < widthPot && y >= 0 && y < heightPot && !visited(x, y)) {
+                    maskDeckX[maskPushPointer] = x;
+                    maskDeckY[maskPushPointer] = y;
+                    maskPushPointer++;
+                    mark(x, y);
                 }
-                directions.forEach(([dx, dy]) => {
-                    const x = currentX + dx;
-                    const y = currentY + dy;
-                    if (x >= 0 && x < widthPot && y >= 0 && y < heightPot && map[y][x] !== "~") {
-                        if (!dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count]) {
-                            dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count] = {};
-                        }
-                        dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count].x = currentX + dx;
-                        dots[dotKey].nextTik.buffer[dots[dotKey].nextTik.count].y = currentY + dy;
-                        dots[dotKey].nextTik.count++;
-                    }
-                });
-                map[currentY][currentX] = "~";
-            }
-            if (dots[dotKey].nextTik.count === 0) {
-                dots[dotKey].isEmpty = true;
-                dotsCount--;
-            }
+            });
         }
     }
     return maxTik;
