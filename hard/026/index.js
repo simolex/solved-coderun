@@ -9,12 +9,12 @@ let k,
     pIndex = 0;
 let gettedParams = false;
 
-let bufferP = new ArrayBuffer(4 * p);
-let pSequence = new Uint16Array(bufferP);
+let bufferP;
+let pSequence;
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout,
+    output: process.stdout
 });
 
 // Данные во входном потоке могут состоять из нескольких строк.
@@ -29,9 +29,9 @@ const rl = readline.createInterface({
 // Пример решения задачи "Вычислите сумму A+B":
 rl.on("line", (line) => {
     if (!gettedParams) {
-        [k, n, p] = line.split(" ").map(Number);
+        [n, k, p] = line.split(" ").map(Number);
         bufferP = new ArrayBuffer(4 * p);
-        pSequence = new Uint16Array(bufferP);
+        pSequence = new Uint32Array(bufferP);
         gettedParams = true;
     } else {
         if (pIndex < p) {
@@ -42,41 +42,41 @@ rl.on("line", (line) => {
         }
     }
 }).on("close", () => {
-    console.log(cars(n, k, pSequence));
-});
-
-function cars(n, k, pArray) {
     let countOperation = 0;
-    let carInPlay = new Set();
-    for (let i = 0; i < pArray.length; i++) {
-        if (carInPlay.size <= k) {
-            if (!carInPlay.has(pArray[i])) {
-                carInPlay.add(pArray[i]);
+    const carInPlay = new Set();
+    const newCars = new Set();
+    const oldCars = new Set();
+    for (let i = 0; i < pSequence.length; i++) {
+        if (carInPlay.size < k) {
+            if (!carInPlay.has(pSequence[i])) {
+                carInPlay.add(pSequence[i]);
                 countOperation++;
             }
         } else {
-            const newCars = new Set();
-            const oldCars = new Set();
-            for (let j = i; j < pArray.length && k - oldCars.size > newCars.size; j++, i++) {
-                if (carInPlay.has(pArray[j])) {
-                    oldCars.add(pArray[j]);
+            for (let j = i; j < pSequence.length && k - oldCars.size > newCars.size; j++) {
+                if (carInPlay.has(pSequence[j])) {
+                    oldCars.add(pSequence[j]);
                 } else {
-                    newCars.add(pArray[j]);
+                    newCars.add(pSequence[j]);
                 }
+                i = j;
             }
-            for (car of carInPlay.values()) {
-                if (!oldCars.has(car)) {
-                    carInPlay.delete(car);
-                    const valuesNewCar = newCars.values();
-                    const itemNewCar = valuesNewCar.next().value;
-                    carInPlay.add(itemNewCar);
-                    newCars.delete(itemNewCar);
-                    countOperation++;
+            if (oldCars.size > 0) {
+                for (const car of carInPlay.values()) {
+                    if (!oldCars.has(car)) {
+                        carInPlay.delete(car);
+                    }
                 }
+            } else {
+                carInPlay.clear();
             }
+            for (const car of newCars.values()) {
+                carInPlay.add(car);
+                countOperation++;
+            }
+            newCars.clear();
+            oldCars.clear();
         }
     }
-    return countOperation;
-}
-
-module.exports = cars;
+    console.log(countOperation);
+});
