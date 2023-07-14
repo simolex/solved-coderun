@@ -14,7 +14,7 @@ let pSequence = new Uint16Array(bufferP);
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 });
 
 // Данные во входном потоке могут состоять из нескольких строк.
@@ -42,7 +42,41 @@ rl.on("line", (line) => {
         }
     }
 }).on("close", () => {
-    console.log(pSequence[4] + 1);
+    console.log(cars(n, k, pSequence));
 });
 
-// module.exports = function (pass) {};
+function cars(n, k, pArray) {
+    let countOperation = 0;
+    let carInPlay = new Set();
+    for (let i = 0; i < pArray.length; i++) {
+        if (carInPlay.size <= k) {
+            if (!carInPlay.has(pArray[i])) {
+                carInPlay.add(pArray[i]);
+                countOperation++;
+            }
+        } else {
+            const newCars = new Set();
+            const oldCars = new Set();
+            for (let j = i; j < pArray.length && k - oldCars.size > newCars.size; j++, i++) {
+                if (carInPlay.has(pArray[j])) {
+                    oldCars.add(pArray[j]);
+                } else {
+                    newCars.add(pArray[j]);
+                }
+            }
+            for (car of carInPlay.values()) {
+                if (!oldCars.has(car)) {
+                    carInPlay.delete(car);
+                    const valuesNewCar = newCars.values();
+                    const itemNewCar = valuesNewCar.next().value;
+                    carInPlay.add(itemNewCar);
+                    newCars.delete(itemNewCar);
+                    countOperation++;
+                }
+            }
+        }
+    }
+    return countOperation;
+}
+
+module.exports = cars;
