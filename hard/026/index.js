@@ -46,6 +46,7 @@ rl.on("line", (line) => {
     const carInPlay = new Set();
     const newCars = new Set();
     const oldCars = new Set();
+    const fullCars = new Set();
     for (let i = 0; i < pSequence.length; i++) {
         if (carInPlay.size < k) {
             if (!carInPlay.has(pSequence[i])) {
@@ -60,6 +61,13 @@ rl.on("line", (line) => {
                     newCars.add(pSequence[j]);
                 }
                 i = j;
+            }
+            for (let m = i; m < pSequence.length; m++) {
+                if (!carInPlay.has(pSequence[m])) {
+                    break;
+                } else {
+                    i = m;
+                }
             }
             if (oldCars.size > 0) {
                 for (const car of carInPlay.values()) {
