@@ -1,6 +1,12 @@
 function getButtonCount(buttons, s) {
-    // your code goes here
-    return 0;
+    const numberSet = s.split("").reduce((set, val) => set.add(val), new Set());
+    let l = numberSet.size;
+    buttons.map((val) => {
+        if (numberSet.has(val)) {
+            l--;
+        }
+    });
+    return l;
 }
 
 const _readline = require("readline");
@@ -27,10 +33,8 @@ function solve() {
 }
 
 function readArray() {
-    var arr = _inputLines[_curLine]
-        .trim(" ")
-        .split(" ")
-        .map((num) => Number(num));
+    var arr = _inputLines[_curLine].trim(" ").split(" ");
+    //.map((num) => Number(num));
     _curLine++;
     return arr;
 }
@@ -40,3 +44,5 @@ function readLine() {
     _curLine++;
     return line;
 }
+
+module.exports = getButtonCount;
