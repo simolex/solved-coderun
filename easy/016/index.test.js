@@ -1,6 +1,6 @@
 const getTransferCount = require(".");
 
-describe("58. OpenCalculator", () => {
+describe("16. Metro", () => {
     test("test", () => {
         const result = getTransferCount(
             5,
