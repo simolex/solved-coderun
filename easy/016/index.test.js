@@ -12,4 +12,16 @@ describe("16. Metro", () => {
         );
         expect(result).toBe(0);
     });
+    test("test", () => {
+        const result = getTransferCount(
+            5,
+            [
+                [4, 1, 2, 4],
+                [2, 5],
+                [5, 3]
+            ],
+            [5, 5]
+        );
+        expect(result).toBe(0);
+    });
 });

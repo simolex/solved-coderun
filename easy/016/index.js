@@ -63,33 +63,33 @@ function getTransferCount(countStations, mapStations, fromTo) {
     }
     let countTranfers = -1;
     let frontPoint = 0;
-    const needLine = [fromTo[0]];
-    vizitedLine.add(fromTo[0]);
+    const startPoint = allStations.get(fromTo[0]);
+    const needLine = [];
+    const stepTransfers = [];
     let step = 0;
-    const stepTransfers = [0];
+    for (const line of startPoint.values()) {
+        needLine.push(line);
+        stepTransfers.push(step);
+        vizitedLine.add(line);
+    }
     const targetLine = allStations.get(fromTo[1]);
-    console.log(allStations);
     while (frontPoint < needLine.length) {
-        const numberPointA = needLine[frontPoint]; //fail!!! need change station to line
-        const pointA = allStations.get(numberPointA);
+        const numberLine = needLine[frontPoint];
 
         let finish = false;
-        for (const startLine of pointA.values()) {
-            if (!finish && targetLine.has(startLine)) {
-                finish = true;
-                countTranfers = stepTransfers[frontPoint];
-            }
+        if (targetLine.has(numberLine)) {
+            finish = true;
+            countTranfers = stepTransfers[frontPoint];
         }
-        if (!finish && listTranfers.has(numberPointA)) {
-            step = stepTransfers[numberPointA] + 1;
-            for (const transfer of listTranfers.get(numberPointA)) {
+        if (!finish && listTranfers.has(numberLine)) {
+            step = stepTransfers[frontPoint] + 1;
+            for (const transfer of listTranfers.get(numberLine).values()) {
                 if (!vizitedLine.has(transfer)) {
                     vizitedLine.add(transfer);
                     needLine.push(transfer);
                     stepTransfers.push(step);
                 }
             }
-            countTranfers++;
         }
         frontPoint++;
     }
