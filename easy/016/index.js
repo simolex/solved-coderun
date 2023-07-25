@@ -29,6 +29,8 @@ function getTransferCount(countStations, mapStations, fromTo) {
     const vizitedLine = new Set();
     const allStations = new Map();
     const listTranfers = new Map();
+
+    if (fromTo[0] > countStations || fromTo[1] > countStations) return -1;
     for (let i = 0; i < countStations; i++) {
         allStations.set(i + 1, new Set());
     }
