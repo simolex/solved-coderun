@@ -25,8 +25,6 @@ const _reader = _readline.createInterface({
     input: process.stdin
 });
 
-const start = performance.now();
-
 const _inputLines = [];
 let _curLine = 0;
 const xSet = new Map();
@@ -97,8 +95,6 @@ function solve() {
         }
     }
     console.log(output);
-    const finish = performance.now();
-    console.log("Call to doSomething took " + (finish - start) + " milliseconds.");
 }
 
 // module.exports = getSales;
