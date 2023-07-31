@@ -44,26 +44,25 @@ _reader.on("line", (lineStr) => {
 process.stdin.on("end", solve);
 
 function partition(items, left, right) {
-    var pivot = items[Math.floor((right + left) / 2)], //middle element
-        i = left, //left pointer
-        j = right; //right pointer
-    while (i <= j) {
-        while (items[i] < pivot) {
-            i++;
+    let temp;
+    const pivot = items[Math.floor((right + left) / 2)]; //middle element
+    while (left <= right) {
+        while (items[left] < pivot) {
+            left++;
         }
-        while (items[j] > pivot) {
-            j--;
+        while (items[right] > pivot) {
+            right--;
         }
-        if (i <= j) {
-            const temp = items[i]; //swap two elements
-            items[i] = items[j];
-            items[j] = temp;
+        if (left <= right) {
+            temp = items[left]; //swap two elements
+            items[left] = items[right];
+            items[right] = temp;
 
-            i++;
-            j--;
+            left++;
+            right--;
         }
     }
-    return i;
+    return left;
 }
 
 function quickSortRecursive(items, left, right) {
