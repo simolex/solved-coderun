@@ -43,13 +43,58 @@ _reader.on("line", (lineStr) => {
 
 process.stdin.on("end", solve);
 
-function solve() {
-    for (const buyer of Object.keys(xSet).sort()) {
-        console.log(`${buyer}:`);
-        for (const product of Object.keys(xSet[buyer]).sort()) {
-            console.log(`${product} ${xSet[buyer][product].count}`);
+function partition(items, left, right) {
+    var pivot = items[Math.floor((right + left) / 2)], //middle element
+        i = left, //left pointer
+        j = right; //right pointer
+    while (i <= j) {
+        while (items[i] < pivot) {
+            i++;
+        }
+        while (items[j] > pivot) {
+            j--;
+        }
+        if (i <= j) {
+            const temp = items[i]; //swap two elements
+            items[i] = items[j];
+            items[j] = temp;
+
+            i++;
+            j--;
         }
     }
+    return i;
+}
+
+function quickSortRecursive(items, left, right) {
+    let index;
+    if (items.length > 1) {
+        index = partition(items, left, right); //index returned from partition
+        if (left < index - 1) {
+            //more elements on the left side of the pivot
+            quickSortRecursive(items, left, index - 1);
+        }
+        if (index < right) {
+            //more elements on the right side of the pivot
+            quickSortRecursive(items, index, right);
+        }
+    }
+    return items;
+}
+
+function quickSort(items) {
+    return quickSortRecursive(items, 0, items.length - 1);
+}
+
+function solve() {
+    let output = "";
+    for (const buyer of quickSort(Object.keys(xSet))) {
+        output += `${buyer}:\n`;
+        for (const product of quickSort(Object.keys(xSet[buyer]))) {
+            output += `${product} ${xSet[buyer][product].count}\n`;
+        }
+    }
+    console.log(output);
 }
 
 // module.exports = getSales;
