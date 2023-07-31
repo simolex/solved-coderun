@@ -25,20 +25,22 @@ const _reader = _readline.createInterface({
     input: process.stdin
 });
 
+const start = performance.now();
+
 const _inputLines = [];
 let _curLine = 0;
-const xSet = {};
+const xSet = new Map();
 
 _reader.on("line", (lineStr) => {
     const line = lineStr.trim(" ").split(" ");
 
-    if (!xSet[line[0]]) {
-        xSet[line[0]] = {};
+    if (!xSet.has(line[0])) {
+        xSet.set(line[0], new Map());
     }
-    if (!xSet[line[0]][line[1]]) {
-        xSet[line[0]][line[1]] = { count: 0 };
+    if (!xSet.get(line[0]).has(line[1])) {
+        xSet.get(line[0]).set(line[1], 0);
     }
-    xSet[line[0]][line[1]].count += +line[2];
+    xSet.get(line[0]).set(line[1], +line[2] + xSet.get(line[0]).get(line[1]));
 });
 
 process.stdin.on("end", solve);
@@ -87,13 +89,16 @@ function quickSort(items) {
 
 function solve() {
     let output = "";
-    for (const buyer of quickSort(Object.keys(xSet))) {
+
+    for (const buyer of quickSort([...xSet.keys()])) {
         output += `${buyer}:\n`;
-        for (const product of quickSort(Object.keys(xSet[buyer]))) {
-            output += `${product} ${xSet[buyer][product].count}\n`;
+        for (const product of quickSort([...xSet.get(buyer).keys()])) {
+            output += `${product} ${xSet.get(buyer).get(product)}\n`;
         }
     }
     console.log(output);
+    const finish = performance.now();
+    console.log("Call to doSomething took " + (finish - start) + " milliseconds.");
 }
 
 // module.exports = getSales;
