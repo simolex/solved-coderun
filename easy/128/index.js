@@ -64,27 +64,34 @@ function quickSort(items) {
 }
 
 function getPedigreeNumberOfDescendants(names, treePairs) {
-    let stack;
-    let pos;
+    let parent;
     let output = "";
-    for (const name of quickSort([...names.keys()])) {
-        if (treePairs.has(name)) {
-            pos = 0;
-            stack = [...treePairs.get(name)];
-            let currentName;
-            while (pos < stack.length) {
-                names.set(name, names.get(name) + 1);
+    let currentNames = names;
+    let newNames;
 
-                currentName = stack[pos];
-                if (treePairs.has(currentName)) {
-                    treePairs.get(currentName).forEach((child) => {
-                        stack.push(child);
-                    });
+    while (currentNames.size > 0) {
+        newNames = new Map();
+        for (const name of currentNames.keys()) {
+            if (treePairs.has(name)) {
+                parent = treePairs.get(name);
+                if (!newNames.has(parent)) {
+                    if (names.has(parent)) {
+                        names.set(parent, names.get(parent) + currentNames.get(name) + 1);
+                    } else {
+                        newNames.set(parent, currentNames.get(name) + 1);
+                    }
+                } else {
+                    newNames.set(parent, newNames.get(parent) + currentNames.get(name) + 1);
                 }
-                pos++;
             }
-            names.set(name, pos);
         }
+        for (const name of newNames.keys()) {
+            names.set(name, newNames.get(name));
+        }
+        currentNames = newNames;
+    }
+
+    for (const name of quickSort([...names.keys()])) {
         output += `${name} ${names.get(name)}\n`;
     }
     return output.trim();
@@ -107,19 +114,21 @@ process.stdin.on("end", solve);
 
 function solve() {
     const N = readNumber();
-    const names = new Map();
+    const namesWithoutChild = new Map();
+    const namesWithChild = new Set();
     const input = new Map();
     for (let i = 0; i < N - 1; i++) {
         const words = readArray();
-        if (!input.has(words[1])) {
-            input.set(words[1], []);
-        }
-        input.get(words[1]).push(words[0]);
-        if (names.has(words[0])) names.set(words[0], 0);
-        if (names.has(words[1])) names.set(words[1], 0);
+        input.set(words[0], words[1]);
+        if (!namesWithoutChild.has(words[0])) namesWithoutChild.set(words[0], 0);
+        namesWithChild.add(words[1]);
     }
+    for (const name of namesWithChild.values()) {
+        namesWithoutChild.delete(name);
+    }
+    namesWithChild.clear();
 
-    const ans = getPedigreeNumberOfDescendants(names, input);
+    const ans = getPedigreeNumberOfDescendants(namesWithoutChild, input);
     console.log(ans);
 }
 
