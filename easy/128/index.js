@@ -63,38 +63,35 @@ function quickSort(items) {
     return quickSortRecursive(items, 0, items.length - 1);
 }
 
-function getPedigreeNumberOfDescendants(names, treePairs) {
-    let parent;
-    let output = "";
-    let currentNames = names;
-    let newNames;
+function getPedigreeNumberOfDescendants(names, treePairs, root) {
+    const pedigree = names;
+    const parentMap = new Map();
+    const childMap = new Map();
+    parentMap.set(root, null);
+    childMap.set(root, 0);
+    let node = root;
 
-    while (currentNames.size > 0) {
-        newNames = new Map();
-        for (const name of currentNames.keys()) {
-            if (treePairs.has(name)) {
-                parent = treePairs.get(name);
-                if (!newNames.has(parent)) {
-                    if (names.has(parent)) {
-                        names.set(parent, names.get(parent) + currentNames.get(name) + 1);
-                    } else {
-                        newNames.set(parent, currentNames.get(name) + 1);
-                    }
-                } else {
-                    newNames.set(parent, newNames.get(parent) + currentNames.get(name) + 1);
-                }
+    while (node) {
+        if (!childMap.has(node)) childMap.set(node, 0);
+        const child = treePairs.has(node) ? treePairs.get(node)[childMap.get(node)] : null;
+        if (child && !parentMap.has(child)) {
+            childMap.set(node, childMap.get(node) + 1);
+            parentMap.set(child, node);
+            node = child;
+        } else {
+            if (!pedigree.has(node)) {
+                pedigree.set(node, 0);
             }
-        }
-        for (const name of newNames.keys()) {
-            names.set(name, newNames.get(name));
-        }
-        currentNames = newNames;
-    }
+            if (parentMap.get(node)) {
+                if (!pedigree.has(parentMap.get(node))) {
+                    pedigree.set(parentMap.get(node), 0);
+                }
+                pedigree.set(parentMap.get(node), pedigree.get(parentMap.get(node)) + pedigree.get(node) + 1);
+            }
 
-    for (const name of quickSort([...names.keys()])) {
-        output += `${name} ${names.get(name)}\n`;
+            node = parentMap.get(node);
+        }
     }
-    return output.trim();
 }
 
 const _readline = require("readline");
@@ -114,22 +111,37 @@ process.stdin.on("end", solve);
 
 function solve() {
     const N = readNumber();
-    const namesWithoutChild = new Map();
-    const namesWithChild = new Set();
     const input = new Map();
+    const nameTopParent = new Set();
+    const nameAllChild = new Set();
+
     for (let i = 0; i < N - 1; i++) {
         const words = readArray();
-        input.set(words[0], words[1]);
-        if (!namesWithoutChild.has(words[0])) namesWithoutChild.set(words[0], 0);
-        namesWithChild.add(words[1]);
-    }
-    for (const name of namesWithChild.values()) {
-        namesWithoutChild.delete(name);
-    }
-    namesWithChild.clear();
+        if (!input.has(words[1])) {
+            input.set(words[1], []);
+        }
+        input.get(words[1]).push(words[0]);
 
-    const ans = getPedigreeNumberOfDescendants(namesWithoutChild, input);
-    console.log(ans);
+        nameTopParent.add(words[1]);
+        nameAllChild.add(words[0]);
+    }
+
+    for (const child of nameAllChild.values()) {
+        nameTopParent.delete(child);
+    }
+
+    const names = new Map();
+    if (nameTopParent.size > 0) {
+        for (const top of nameTopParent.values()) {
+            getPedigreeNumberOfDescendants(names, input, top);
+        }
+    }
+
+    let output = "";
+    for (const name of quickSort([...names.keys()])) {
+        output += `${name} ${names.get(name)}\n`;
+    }
+    console.log(output.trim());
 }
 
 function readArray() {
