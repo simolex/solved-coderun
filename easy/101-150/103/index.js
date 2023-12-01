@@ -1,23 +1,41 @@
 /**
- * 81. Треугольник
+ * 103. Расстановка ноутбуков
  *
- * Даны три натуральных числа. Возможно ли построить треугольник с такими сторонами? Если это возможно,
- * выведите строку YES, иначе выведите строку NO.
- * Треугольник — это три точки, не лежащие на одной прямой.
+ * В школе решили на один прямоугольный стол поставить два прямоугольных ноутбука. Ноутбуки нужно поставить так,
+ * чтобы их стороны были параллельны сторонам стола. Определите, какие размеры должен иметь стол, чтобы оба
+ * ноутбука на него поместились, и площадь стола была минимальна.
  *
  * Формат ввода:
- * Вводятся три натуральных числа.
+ * Вводится четыре натуральных числа, первые два задают размеры одного ноутбука, а следующие два — размеры второго.
+ * Числа не превышают 1000.
  *
  * Формат вывода:
- * Выведите ответ на задачу.
+ * Выведите два числа — размеры стола. Если возможно несколько ответов, выведите любой из них (но только один).
  */
 
-function isTriangle(a, b, c) {
-    const ab = a + b;
-    const ac = a + c;
-    const bc = b + c;
+function getMinTable(a, b, c, d) {
+    const getTableSize = (a1, b1, a2, b2) => {
+        return [Math.max(a1, a2), b1 + b2];
+    };
 
-    return ab > c && ac > b && bc > a ? "YES" : "NO";
+    const allSize = [];
+
+    allSize.push(getTableSize(a, b, c, d));
+    allSize.push(getTableSize(a, b, d, c));
+    allSize.push(getTableSize(b, a, c, d));
+    allSize.push(getTableSize(b, a, d, c));
+
+    const minSquare = allSize.reduce((m, v) => Math.min(m, v[0] * v[1]), Infinity);
+
+    result = [];
+    allSize.forEach((v) => {
+        if (v[0] * v[1] === minSquare) {
+            result.push(v);
+            result.push([v[1], v[0]]);
+        }
+    });
+
+    return result;
 }
 
 const _readline = require("readline");
@@ -36,13 +54,15 @@ _reader.on("line", (line) => {
 process.stdin.on("end", solve);
 
 function solve() {
-    const a = readInt();
-    const b = readInt();
-    const c = readInt();
+    const sizes = readArray();
+    const a = sizes[0];
+    const b = sizes[1];
+    const c = sizes[2];
+    const d = sizes[3];
 
-    const result = isTriangle(a, b, c);
+    const result = getMinTable(a, b, c, d);
 
-    console.log(result);
+    console.log(result[0].join(" "));
 }
 
 function readInt() {
@@ -69,4 +89,4 @@ function readEdges(n) {
     return grid;
 }
 
-module.exports = isTriangle;
+module.exports = getMinTable;
