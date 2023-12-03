@@ -1,6 +1,6 @@
 const solution = require(".");
 
-describe("70. Nearest number", () => {
+describe("69. More your neighbors", () => {
     test("test-1", () => {
         const result = solution([1, 2, 3, 4, 5]);
         expect(result).toBe(0);
