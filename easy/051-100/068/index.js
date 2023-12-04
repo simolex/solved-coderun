@@ -33,8 +33,6 @@
 function maxCupPlace(n, list) {
     let place = 0;
     let indexWinner = 0;
-    let fromRight = 0;
-    let resultVasily;
 
     for (let i = 1; i < n; i++) {
         if (list[i] > list[indexWinner]) {
@@ -42,33 +40,40 @@ function maxCupPlace(n, list) {
         }
     }
 
-    for (let i = indexWinner + 1; i < n - 1; i++) {
-        if (list[i] % 10 === 5 && list[i] > list[i + 1]) {
-            place = i + 1;
+    for (let p = indexWinner + 1; p < n - 1; p++) {
+        if (list[p] % 10 === 5 && list[p] > list[p + 1]) {
+            if (place === 0) {
+                place = p;
+            } else {
+                place = list[p] > list[place] ? p : place;
+            }
         }
     }
-    if (place > 0) {
-        resultVasily = list[place - 1];
 
-        for (let i = place; i < n; i++) {
+    if (place > 0) {
+        let fromRight = 0;
+        let resultVasily = list[place];
+
+        for (let i = place + 1; i < n; i++) {
             if (list[i] > resultVasily) {
                 fromRight++;
             }
         }
-        for (let i = 0; i < place - 1; i++) {
+
+        for (let i = 0; i < place; i++) {
             if (list[i] <= resultVasily) {
                 fromRight--;
             }
         }
+        return place + fromRight + 1;
     }
-
-    return place + fromRight;
+    return 0;
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
