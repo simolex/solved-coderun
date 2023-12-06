@@ -18,43 +18,18 @@
  */
 
 function appendSymSequence(n, list) {
-    let place = 0;
-    let indexWinner = 0;
-
-    for (let i = 1; i < n; i++) {
-        if (list[i] > list[indexWinner]) {
-            indexWinner = i;
-        }
-    }
-
-    for (let p = indexWinner + 1; p < n - 1; p++) {
-        if (list[p] % 10 === 5 && list[p] > list[p + 1]) {
-            if (place === 0) {
-                place = p;
-            } else {
-                place = list[p] > list[place] ? p : place;
+    for (let i = 0; i < n - 1; i++) {
+        let polyndrom = true;
+        for (let j = 0; j < Math.floor((n - i) / 2) && polyndrom; j++) {
+            if (list[i + j] !== list[n - j - 1]) {
+                polyndrom = false;
             }
         }
-    }
-
-    if (place > 0) {
-        let fromRight = 0;
-        let resultVasily = list[place];
-
-        for (let i = place + 1; i < n; i++) {
-            if (list[i] > resultVasily) {
-                fromRight++;
-            }
+        if (polyndrom) {
+            return list.slice(0, i).reverse();
         }
-
-        for (let i = 0; i < place; i++) {
-            if (list[i] <= resultVasily) {
-                fromRight--;
-            }
-        }
-        return place + fromRight + 1;
     }
-    return 0;
+    return list.slice(0, n - 1).reverse();
 }
 
 const _readline = require("readline");
