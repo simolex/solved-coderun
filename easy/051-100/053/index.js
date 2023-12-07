@@ -29,16 +29,56 @@
  */
 
 function getPointsInManhattan(t, d, n, navCoords) {
-    return [
-        [1, 5],
-        [2, 4],
-    ];
+    const getRhomb = (x, y, delta) => {
+        const f = x - y;
+        const b = x + y;
+        return [f - delta, f + delta, b - delta, b + delta]; // Rhomb = [Lf, Rf, Lb, Rb], f = x-y, b = x+y
+    };
+
+    const getIntersect = (runner, navigator) => {
+        if (
+            runner[1] < navigator[0] ||
+            runner[0] > navigator[1] ||
+            runner[3] < navigator[2] ||
+            runner[2] > navigator[3]
+        ) {
+            return [];
+        }
+
+        return [
+            Math.max(runner[0], navigator[0]),
+            Math.min(runner[1], navigator[1]),
+            Math.max(runner[2], navigator[2]),
+            Math.min(runner[3], navigator[3])
+        ];
+    };
+
+    const expandRhomb = (romb, delta) => [romb[0] - delta, romb[1] + delta, romb[2] - delta, romb[3] + delta];
+
+    let runnerRhomb = getRhomb(0, 0, t);
+    let locationRhomb;
+    let intesection;
+
+    for (let i = 0; i < n; i++) {
+        locationRhomb = getRhomb(navCoords[i][0], navCoords[i][1], d);
+        intesection = getIntersect(runnerRhomb, locationRhomb);
+        runnerRhomb = expandRhomb(intesection, t);
+    }
+    const result = [];
+    for (let i = intesection[0]; i <= intesection[1]; i++) {
+        for (let j = intesection[2]; j <= intesection[3]; j++) {
+            if ((i + j) % 2 !== 0) continue;
+            const x = (i + j) / 2;
+            result.push([x, j - x]);
+        }
+    }
+    return result;
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
