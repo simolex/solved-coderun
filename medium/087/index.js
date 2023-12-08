@@ -35,15 +35,74 @@
  */
 
 function countWordOfMaya(g, l, W, S) {
-    const lettersOfWord = new Map();
-    W.split("").forEach((l) => {
-        if (lettersOfWord.has(l)) {
-            lettersOfWord.get(l)[0]++;
+    const setOfWord = new Map();
+    const currentSet = new Map();
+    const equalSet = new Set();
+
+    const wordLength = g;
+    const textLength = l;
+    let frontLetter, backLetter;
+
+    const compSetsByLetters = (letter) => {
+        if (
+            currentSet.has(letter) &&
+            setOfWord.has(letter) &&
+            currentSet.get(letter)[0] === setOfWord.get(letter)[0]
+        ) {
+            equalSet.add(letter);
         } else {
-            lettersOfWord.set(l, [1]);
+            equalSet.delete(letter);
         }
-    });
-    console.log(lettersOfWord);
+    };
+
+    const saveLetterToSet = (set, letter) => {
+        if (set.has(letter)) {
+            set.get(letter)[0]++;
+        } else {
+            set.set(letter, [1]);
+        }
+    };
+
+    const deleteLetterFromSet = (set, letter) => {
+        if (set.has(letter)) {
+            if (set.get(letter)[0] > 1) {
+                set.get(letter)[0]--;
+            } else {
+                set.delete(letter);
+            }
+        }
+    };
+
+    let compCounter = 0;
+    const checkEqualAndCount = () => {
+        if (equalSet.size === setOfWord.size) {
+            compCounter++;
+        }
+    };
+
+    W.split("").forEach((letter) => saveLetterToSet(setOfWord, letter));
+
+    for (let i = 0; i < wordLength; i++) {
+        frontLetter = S.charAt(i);
+        saveLetterToSet(currentSet, frontLetter);
+
+        compSetsByLetters(frontLetter);
+    }
+    checkEqualAndCount();
+
+    for (let i = wordLength; i < textLength; i++) {
+        frontLetter = S.charAt(i);
+        saveLetterToSet(currentSet, frontLetter);
+        compSetsByLetters(frontLetter);
+
+        backLetter = S.charAt(i - wordLength);
+        deleteLetterFromSet(currentSet, backLetter);
+        compSetsByLetters(backLetter);
+
+        checkEqualAndCount();
+    }
+
+    return compCounter;
 }
 
 const _readline = require("readline");
@@ -63,8 +122,8 @@ process.stdin.on("end", solve);
 
 function solve() {
     const params = readArray();
-    const g = params[0];
-    const l = params[1];
+    const g = Number(params[0]);
+    const l = Number(params[1]);
 
     const W = readLine();
     const S = readLine();
