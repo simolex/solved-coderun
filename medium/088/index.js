@@ -63,7 +63,7 @@ function countErrors(dict, S) {
         word = word.toLowerCase();
         if (dictionary.has(word)) {
             const mask = 1 << (word.length - index - 1);
-            if ((dictionary.get(word)[0] & mask) === mask) {
+            if ((dictionary.get(word)[0] & mask) > 0) {
                 return true;
             }
         }
@@ -75,31 +75,32 @@ function countErrors(dict, S) {
             const mask = createMask(word);
             saveMaskToDict(word, mask);
         });
-        console.log(dictionary);
 
         const setOfWord = S.split(" ");
         setOfWord.forEach((word) => {
             let countError = 0;
             let countAccent = 0;
-            let countDictAccent = 0;
 
-            for (let i = 0; i < word.length; i++) {
-                if (isAccent(word, i)) {
-                    countAccent++;
-                    if (existAccent(word, i)) {
-                        countDictAccent++;
-                    } else {
-                        countError++;
+            if (existWord(word)) {
+                for (let i = 0; i < word.length; i++) {
+                    if (isAccent(word, i)) {
+                        countAccent++;
+                        if (!existAccent(word, i)) {
+                            countError++;
+                        }
                     }
                 }
-            }
-            console.log(word.toLowerCase(), countError, countAccent, countDictAccent);
-            if (existWord(word)) {
-                if (countAccent > countDictAccent || countAccent === 0) {
+
+                if ((countAccent > 0 && countError > 0) || countAccent === 0 || countAccent > 1) {
                     error++;
                 }
             } else {
-                if (countAccent === 0 || countError > 1) {
+                for (let i = 0; i < word.length; i++) {
+                    if (isAccent(word, i)) {
+                        countAccent++;
+                    }
+                }
+                if (countAccent === 0 || countAccent > 1) {
                     error++;
                 }
             }
@@ -112,7 +113,7 @@ function countErrors(dict, S) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
