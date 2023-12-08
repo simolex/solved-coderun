@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Электронный архив</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            .body {
+                background-color: #d4f0a8;
+            }
+            .container {
+                max-width: 920px;
+                margin: 70px auto;
+                border: 1px solid #86c421;
+                box-shadow: 3px 3px 7px #b5e566;
+                border-radius: 8px;
+                padding: 30px 60px;
+                background-color: #fff;
+            }
+
+            .archive_title {
+                color: #004480;
+                text-align: left;
+                font-size: 42px;
+                margin-bottom: 36px;
+                margin-top: 0;
+            }
+            .archive__list {
+                list-style: none;
+                padding-left: 7px;
+            }
+            .archive__item {
+                margin-bottom: 7px;
+            }
+            .archive__link {
+                text-decoration: none;
+                font-size: 24px;
+                color: #555;
+            }
+            .archive__link:hover {
+                text-decoration: underline;
+                color: hsl(83, 71%, 30%);
+            }
+        </style>
+    </head>
+
+    <body class="body">
+        <div class="container">
+            <h1 class="archive_title">Хранилища электронных образов&nbsp;архива</h1>
+            <ul class="archive__list">
+                <li class="archive__item">
+                    <a href="/archive-kd/" class="archive__link"
+                        >1. Электронный архив кадастровых дел</a
+                    >
+                </li>
+                <li class="archive__item">
+                    <a href="/archive-16zg/" class="archive__link"
+                        >2. Электронный архив Земля (Город)</a
+                    >
+                </li>
+                <li class="archive__item">
+                    <a href="/archive-16zo/" class="archive__link"
+                        >3. Электронный архив Земля (Область)</a
+                    >
+                </li>
+                <li class="archive__item">
+                    <a href="/archive-16og/" class="archive__link"
+                        >4. Электронный архив ОКС (Город)</a
+                    >
+                </li>
+                <li class="archive__item">
+                    <a href="/archive-16oo/" class="archive__link"
+                        >5. Электронный архив ОКС (Область)</a
+                    >
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

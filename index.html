@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            body {
+                background-color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <svg xmlns="http://www.w3.org/2000/svg" class="header__wave" viewBox="0 0 200 80">
+            <defs>
+                <linearGradient x1="0%" y1="0%" x2="100%" y2="0%" id="g1">
+                    <stop offset="0%" stop-color="navy" stop-opacity="1" />
+                    <stop offset="100%" stop-color="navy" stop-opacity=".2" />
+                </linearGradient>
+                <mask id="line">
+                    <rect x="0" y="0" width="200" height="80" fill="white" />
+                    <line
+                        x1="100"
+                        y1="0"
+                        x2="100"
+                        y2="80"
+                        stroke="black"
+                        stroke-width="2"
+                        stroke-dasharray="5 7"
+                    />
+                </mask>
+                <mask id="wave">
+                    <rect width="300" height="51" fill="white" />
+                    <path
+                        transform="translate(0 30)"
+                        fill="white"
+                        d="M 0 0 L 200 0 L 200 7 Q 150 5 100 7 Q 50 9 0 7 Z"
+                    />
+                </mask>
+            </defs>
+            <rect fill="white" width="200" height="79" />
+            <rect fill="darkblue" width="200" height="80" mask="url(#wave)" />
+            <g mask="url(#line)">
+                <rect fill="lightblue" width="300" height="80" />
+                <rect fill="url(#g1)" width="200" height="80" mask="url(#wave)" />
+            </g>
+        </svg>
+    </body>
+</html>

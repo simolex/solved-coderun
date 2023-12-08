@@ -49,7 +49,7 @@ function countWordOfMaya(g, l, W, S) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
@@ -89,14 +89,5 @@ function readLine() {
 function readNumber() {
     return Number(_inputLines[_curLine++]);
 }
-
-// function readStations() {
-//     const M = readNumber();
-//     let stations = [];
-//     for (let i = 0; i < M; i++) {
-//         stations.push(readArray());
-//     }
-//     return stations;
-// }
 
 module.exports = countWordOfMaya;
