@@ -1,5 +1,6 @@
 /**
  * 50. Самое частое слово
+ *
  * Дан текст. Выведите слово, которое в этом тексте встречается чаще всего.
  * Если таких слов несколько, выведите то, которое меньше в лексикографическом порядке.
  *
@@ -33,7 +34,7 @@ function getCountWordsText(text) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];

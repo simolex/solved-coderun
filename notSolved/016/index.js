@@ -1,4 +1,7 @@
 /**
+ *
+ * 16. Метро
+ *
  * Метрополитен состоит из нескольких линий метро.
  * Все станции метро в городе пронумерованы натуральными числами от 1 до N.
  * На каждой линии расположено несколько станций. Если одна и та же станция расположена
@@ -101,7 +104,7 @@ function getTransferCount(countStations, mapStations, fromTo) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
