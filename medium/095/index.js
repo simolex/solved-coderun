@@ -28,36 +28,53 @@
  */
 
 function hyperCheckers(n, k, cards) {
-    const cardsCount = cards.reduce((mapCards, card) => {
-        if (mapCards.has(card)) {
-            mapCards.get(card)[0]++;
-        } else {
-            mapCards.set(card, [1]);
-        }
-        return mapCards;
-    }, new Map());
+    let count = 0;
+    const cardsCount = {};
 
-    console.log(cardsCount);
-    const cardsOrdered = [...cardsCount.keys()].sort((a, b) => a - b);
-    console.log(cardsOrdered);
+    for (let card of cards) {
+        if (cardsCount[card]) {
+            cardsCount[card]++;
+        } else {
+            cardsCount[card] = 1;
+        }
+    }
+    const cardsOrdered = Object.keys(cardsCount).sort((a, b) => a - b);
 
     const uniqLength = cardsOrdered.length;
     let right = 0;
-    let sum = 0;
+    let notOnceCards = 0;
     for (let left = 0; left < cardsOrdered.length; left++) {
         while (cardsOrdered[right] / cardsOrdered[left] <= k && right < uniqLength) {
-            sum += cardsCount[cardsOrdered[right]];
+            if (cardsCount[cardsOrdered[right]] > 1) {
+                notOnceCards++;
+            }
             right++;
         }
-        console.log(cardsOrdered[left], cardsOrdered[right - 1]);
+        const selectedTypes = right - left;
+        const leftCount = cardsCount[cardsOrdered[left]];
+        if (selectedTypes > 2) {
+            const differentType = ((selectedTypes - 2) * (selectedTypes - 1)) / 2;
+            count += differentType * 6;
+        }
+        if (selectedTypes > 1) {
+            if (leftCount > 1) {
+                count += (selectedTypes - 1) * 3;
+            }
+
+            count += 3 * (notOnceCards - (leftCount > 1 ? 1 : 0));
+        }
+        if (leftCount > 2) {
+            count++;
+        }
+        notOnceCards -= leftCount > 1 ? 1 : 0;
     }
-    return 0;
+    return count;
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
