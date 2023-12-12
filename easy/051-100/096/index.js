@@ -14,46 +14,55 @@
  */
 
 function findSubstring(n, k, inString) {
-    // let minLeft = 0;
-    // let minRight = n;
-    // const treesColor = new Uint32Array(k + 1);
-    // treesColor.fill(0);
-    // let treesColorSize = 0;
-    // let right = -1;
-    // const addColor = (color) => {
-    //     if (treesColor[color] > 0) {
-    //         treesColor[color]++;
-    //     } else {
-    //         treesColor[color] = 1;
-    //         treesColorSize++;
-    //     }
-    // };
-    // const delColor = (color) => {
-    //     if (treesColor[color] > 0) {
-    //         treesColor[color]--;
-    //         if (treesColor[color] === 0) {
-    //             treesColorSize--;
-    //         }
-    //     }
-    // };
-    // for (let left = 0; left < n; left++) {
-    //     while (treesColorSize < k && right < n - 1) {
-    //         right++;
-    //         addColor(avenue[right]);
-    //     }
-    //     if (treesColorSize === k && minRight - minLeft > right - left) {
-    //         minLeft = left;
-    //         minRight = right;
-    //     }
-    //     delColor(avenue[left]);
-    // }
-    // return [minLeft + 1, minRight + 1];
+    let minLeft = 0;
+    let maxRight = 0;
+    let right = -1;
+    let kLimit = k;
+    let badLetter = "";
+    let existBadLetter = false;
+    const mapLetter = {};
+
+    const addColor = (letter) => {
+        if (mapLetter[letter]) {
+            mapLetter[letter]++;
+            if (mapLetter[letter] > kLimit) {
+                existBadLetter = true;
+                badLetter = letter;
+            }
+        } else {
+            mapLetter[letter] = 1;
+        }
+        return existBadLetter;
+    };
+    const delColor = (letter) => {
+        if (mapLetter[letter] > 0) {
+            mapLetter[letter]--;
+            if (letter === badLetter && mapLetter[badLetter] <= kLimit) {
+                existBadLetter = false;
+                badLetter = "";
+            }
+        }
+    };
+
+    for (let left = 0; left < n; left++) {
+        while (!existBadLetter && right < n - 1) {
+            right++;
+            addColor(inString.charAt(right));
+            if (!existBadLetter && maxRight - minLeft < right - left) {
+                minLeft = left;
+                maxRight = right;
+            }
+        }
+        delColor(inString.charAt(left));
+    }
+
+    return [maxRight - minLeft + 1, minLeft + 1];
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
