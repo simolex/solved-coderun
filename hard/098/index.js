@@ -49,8 +49,9 @@ function countTriangle(n, coords) {
             for (let k = j + 1; k < n; k++) {
                 edgeSecond = getEdgeLength(i, k);
                 edgeThird = getEdgeLength(j, k);
-
-                console.log(edgeFirst, edgeSecond, edgeThird);
+                if (edgeFirst === edgeSecond || edgeFirst === edgeThird || edgeSecond === edgeThird) {
+                    count++;
+                }
             }
         }
     }
@@ -60,7 +61,7 @@ function countTriangle(n, coords) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
