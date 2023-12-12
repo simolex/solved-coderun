@@ -50,7 +50,7 @@ function countTriangle(n, coords) {
                 edgeSecond = getEdgeLength(i, k);
                 edgeThird = getEdgeLength(j, k);
 
-                console.log(edgeThird, edgeSecond, edgeThird);
+                console.log(edgeFirst, edgeSecond, edgeThird);
             }
         }
     }
