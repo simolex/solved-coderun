@@ -45,22 +45,23 @@ const rightSearch = (l, r, checkFn, ...checkParams) => {
 
 function getMinimalTime(N, x, y) {
     const faster = Math.min(x, y);
+    let allTime = 0;
 
     if (N > 1) {
         const isValid = (time) => {
             return Math.floor(time / x) + Math.floor(time / y) >= N - 1;
         };
 
-        return leftSearch(faster + 1, 10 ** 10, isValid);
+        allTime = leftSearch(0, 10 ** 10, isValid);
     }
 
-    return faster * N;
+    return faster + allTime;
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
