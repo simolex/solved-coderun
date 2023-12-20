@@ -1,6 +1,6 @@
 const solution = require(".");
 
-describe("97. Robot", () => {
+describe("99. Binary search", () => {
     test("test-1", () => {
         const result = solution(
             10,
