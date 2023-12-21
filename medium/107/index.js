@@ -51,19 +51,36 @@ const rightSearch = (l, r, checkFn, ...checkParams) => {
     return l;
 };
 
-function minDiscomfort(N, K, segments) {
-    // let maxLength = segments.reduce((max, w) => Math.max(max, w), 0);
-    // const isValid = (length) => {
-    //     return segments.reduce((sum, w) => sum + Math.floor(w / length), 0) >= K;
-    // };
-    // const lengthSegment = rightSearch(0, maxLength, isValid);
-    // return lengthSegment;
+/**
+ *
+ * @param {Number} N    количество человек в классе
+ * @param {Number} R    количество бригад
+ * @param {Number} C    количество человек
+ * @param {Array<Number>} heights   Рост ученика — натуральное число, не превышающее 1 000 000 000
+ * @returns Number
+ */
+function minDiscomfort(N, R, C, heights) {
+    heights.sort((a, b) => a - b);
+    const maxDelta = heights[N - 1] - heights[0];
+
+    const isValid = (delta) => {
+        let countGang = 0;
+        for (let i = 0; i < N - C + 1; i++) {
+            if (heights[i + C - 1] - heights[i] <= delta) {
+                countGang++;
+                i = i + C - 1;
+            }
+        }
+        return countGang >= R;
+    };
+
+    return leftSearch(0, maxDelta, isValid);
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
@@ -79,7 +96,7 @@ function solve() {
     const params = readArray();
     const N = params[0];
     const R = params[1];
-    const C = params[1];
+    const C = params[2];
 
     const heights = [];
     for (let i = 0; i < N; i++) {
