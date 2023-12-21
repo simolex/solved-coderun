@@ -52,15 +52,78 @@ const rightSearch = (l, r, checkFn, ...checkParams) => {
     return l;
 };
 
-/**
- *
- * @param {Number} N    количество последовательностей
- * @param {Number} L    длина последовательности
- * @param {Array<Array<Number>>} setOfParams[][]   Рост ученика — натуральное число, не превышающее 1 000 000 000
- * @returns Array<Number>
- */
+function initSequence(N, L, setOfParams) {
+    const setOfSets = [];
+
+    let seqID;
+    let curSeq_D;
+
+    const setSequence_D = new Map();
+
+    for (let i = 0; i < N; i++) {
+        const newSet = [];
+        seqID = JSON.stringify(setOfParams[i].slice(1));
+
+        if (!setSequence_D.has(seqID)) {
+            curSeq_D = [];
+            curSeq_D[0] = setOfParams[i][1];
+
+            const pA = setOfParams[i][2];
+            const pC = setOfParams[i][3];
+            const pM = setOfParams[i][4];
+
+            for (let i = 1; i < L; i++) {
+                curSeq_D[i] = (pA * curSeq_D[i - 1] + pC) % pM;
+            }
+
+            setSequence_D.set(seqID, curSeq_D);
+        }
+
+        curSeq_D = setSequence_D.get(seqID);
+
+        newSet[0] = setOfParams[i][0];
+        for (let i = 1; i < L; i++) {
+            newSet[i] = newSet[i - 1] + curSeq_D[i - 1];
+        }
+
+        setOfSets[i] = newSet;
+    }
+    delete setSequence_D;
+
+    return setOfSets;
+}
+
 function getMedianUnion_2(N, L, setOfParams) {
     const result = [];
+    const setOfSets = initSequence(N, L, setOfParams);
+
+    const isPosition = (index, set, value) => {
+        return value >= set[index];
+    };
+
+    const isMedian = (mayMedian, set_1, set_2) => {
+        const posFromLeft_1 = rightSearch(0, L - 1, isPosition, set_1, mayMedian);
+        const posFromLeft_2 = rightSearch(0, L - 1, isPosition, set_2, mayMedian);
+        //console.log(mayMedian, posFromLeft_1, posFromLeft_2, set_1, set_2);
+        const sumPosition = posFromLeft_1 + posFromLeft_2 + 2;
+
+        return sumPosition >= L - 1 && 2 * L - sumPosition <= L;
+    };
+
+    let firstSet, secondSet;
+    let minInSet, maxInSet;
+    let currentMedian;
+
+    for (let i = 0; i < N - 1; i++) {
+        for (let j = i + 1; j < N; j++) {
+            firstSet = setOfSets[i];
+            secondSet = setOfSets[j];
+            minInSet = Math.min(firstSet[0], secondSet[0]);
+            maxInSet = Math.max(firstSet[L - 1], secondSet[L - 1]);
+            currentMedian = leftSearch(minInSet, maxInSet, isMedian, firstSet, secondSet);
+            result.push(currentMedian);
+        }
+    }
 
     return result;
 }
