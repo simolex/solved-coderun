@@ -184,6 +184,7 @@ function readArray() {
     var arr = _inputLines[_curLine]
         .trim(" ")
         .split(" ")
+        .filter((num) => num.length > 0)
         .map((num) => Number(num));
     _curLine++;
     return arr;
