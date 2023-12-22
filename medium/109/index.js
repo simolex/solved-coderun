@@ -104,7 +104,7 @@ function getMedianUnion_2(N, L, setOfParams) {
     };
 
     const getCountLeft = (set, median) => {
-        const pos = rightSearch(0, L - 1, isPositionBe, set, median);
+        const pos = rightSearch(0, L - 1, isPosition, set, median);
         if (pos === L - 1) {
             return L;
         }
