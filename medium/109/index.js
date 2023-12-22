@@ -99,13 +99,12 @@ function getMedianUnion_2(N, L, setOfParams) {
         return set[index] < median;
     };
 
-    const isPositionBe = (index, set, median) => {
-        return set[index] <= median;
-    };
-
     const getCountLeft = (set, median) => {
-        const pos = rightSearch(0, L - 1, isPosition, set, median);
-        if (pos === L - 1) {
+        const pos = rightSearch(-1, L, isPosition, set, median);
+        if (pos < 0) {
+            return 0;
+        }
+        if (pos === L) {
             return L;
         }
         return pos + 1;
@@ -115,13 +114,11 @@ function getMedianUnion_2(N, L, setOfParams) {
         const count_1 = getCountLeft(set_1, mayMedian);
         const count_2 = getCountLeft(set_2, mayMedian);
 
-        console.log(mayMedian, count_1, count_2, set_1, set_2);
-
         const sumPosition = count_1 + count_2;
         curPos[0] = count_1;
         curPos[1] = count_2;
 
-        return sumPosition > L - 1 && 2 * L - sumPosition <= L;
+        return sumPosition <= L - 1 && 2 * L - sumPosition >= L;
     };
 
     let mayBeMedian;
@@ -138,14 +135,7 @@ function getMedianUnion_2(N, L, setOfParams) {
             minInSet = Math.min(curSet[0][0], curSet[1][0]);
             maxInSet = Math.max(curSet[0][L - 1], curSet[1][L - 1]);
 
-            currentMedian = leftSearch(minInSet, maxInSet, isMedian, curSet[0], curSet[1], curPos);
-            console.log(currentMedian, curPos);
-            // mayBeMedian = curPos.map((p, i) => Math.abs(curSet[i][p - 1] - currentMedian));
-            // currentMedian =
-            //     mayBeMedian[0] > mayBeMedian[1]
-            //         ? curSet[1][curPos[1] - 1]
-            //         : curSet[0][curPos[0] - 1];
-            // console.log(currentMedian);
+            currentMedian = rightSearch(minInSet, maxInSet, isMedian, curSet[0], curSet[1], curPos);
 
             result.push(currentMedian);
         }
@@ -157,7 +147,7 @@ function getMedianUnion_2(N, L, setOfParams) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
