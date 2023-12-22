@@ -75,7 +75,6 @@ function initSequence(N, L, setOfParams) {
             for (let i = 1; i < L; i++) {
                 curSeq_D[i] = (pA * curSeq_D[i - 1] + pC) % pM;
             }
-
             setSequence_D.set(seqID, curSeq_D);
         }
 
@@ -88,7 +87,6 @@ function initSequence(N, L, setOfParams) {
 
         setOfSets[i] = newSet;
     }
-    delete setSequence_D;
 
     return setOfSets;
 }
@@ -97,30 +95,58 @@ function getMedianUnion_2(N, L, setOfParams) {
     const result = [];
     const setOfSets = initSequence(N, L, setOfParams);
 
-    const isPosition = (index, set, value) => {
-        return value >= set[index];
+    const isPosition = (index, set, median) => {
+        return set[index] < median;
     };
 
-    const isMedian = (mayMedian, set_1, set_2) => {
-        const posFromLeft_1 = rightSearch(0, L - 1, isPosition, set_1, mayMedian);
-        const posFromLeft_2 = rightSearch(0, L - 1, isPosition, set_2, mayMedian);
-        //console.log(mayMedian, posFromLeft_1, posFromLeft_2, set_1, set_2);
-        const sumPosition = posFromLeft_1 + posFromLeft_2 + 2;
-
-        return sumPosition >= L - 1 && 2 * L - sumPosition <= L;
+    const isPositionBe = (index, set, median) => {
+        return set[index] <= median;
     };
 
-    let firstSet, secondSet;
+    const getCountLeft = (set, median) => {
+        const pos = rightSearch(0, L - 1, isPositionBe, set, median);
+        if (pos === L - 1) {
+            return L;
+        }
+        return pos + 1;
+    };
+
+    const isMedian = (mayMedian, set_1, set_2, curPos) => {
+        const count_1 = getCountLeft(set_1, mayMedian);
+        const count_2 = getCountLeft(set_2, mayMedian);
+
+        console.log(mayMedian, count_1, count_2, set_1, set_2);
+
+        const sumPosition = count_1 + count_2;
+        curPos[0] = count_1;
+        curPos[1] = count_2;
+
+        return sumPosition > L - 1 && 2 * L - sumPosition <= L;
+    };
+
+    let mayBeMedian;
+    const curSet = [];
     let minInSet, maxInSet;
     let currentMedian;
+    let curPos = [];
 
     for (let i = 0; i < N - 1; i++) {
         for (let j = i + 1; j < N; j++) {
-            firstSet = setOfSets[i];
-            secondSet = setOfSets[j];
-            minInSet = Math.min(firstSet[0], secondSet[0]);
-            maxInSet = Math.max(firstSet[L - 1], secondSet[L - 1]);
-            currentMedian = leftSearch(minInSet, maxInSet, isMedian, firstSet, secondSet);
+            curSet[0] = setOfSets[i];
+            curSet[1] = setOfSets[j];
+
+            minInSet = Math.min(curSet[0][0], curSet[1][0]);
+            maxInSet = Math.max(curSet[0][L - 1], curSet[1][L - 1]);
+
+            currentMedian = leftSearch(minInSet, maxInSet, isMedian, curSet[0], curSet[1], curPos);
+            console.log(currentMedian, curPos);
+            // mayBeMedian = curPos.map((p, i) => Math.abs(curSet[i][p - 1] - currentMedian));
+            // currentMedian =
+            //     mayBeMedian[0] > mayBeMedian[1]
+            //         ? curSet[1][curPos[1] - 1]
+            //         : curSet[0][curPos[0] - 1];
+            // console.log(currentMedian);
+
             result.push(currentMedian);
         }
     }
