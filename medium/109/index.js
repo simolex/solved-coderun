@@ -181,10 +181,9 @@ function readInt() {
 }
 
 function readArray() {
-    var arr = _inputLines[_curLine]
-        .trim(" ")
-        .split(" ")
-        .filter((num) => num.length > 0)
+    let arr = _inputLines[_curLine]
+        .trim()
+        .split(/\s+/)
         .map((num) => Number(num));
     _curLine++;
     return arr;
