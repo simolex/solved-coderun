@@ -20,7 +20,7 @@
  */
 
 function noControlled(N, M, desks) {
-    let result =0;
+    let result = 0;
 
     return result;
 }
