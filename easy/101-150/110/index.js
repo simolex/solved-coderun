@@ -19,8 +19,37 @@
  * Выведите одно число — количество студентов оставшихся без наблюдения.
  */
 
+const EventType = {
+    onObserve: 1,
+    offObserve: 2
+};
+
 function noControlled(N, M, desks) {
-    let result = 0;
+    let result = N;
+    const events = [];
+
+    for (let i = 0; i < M; i++) {
+        events.push([desks[i][0], EventType.onObserve]);
+        events.push([desks[i][1], EventType.offObserve]);
+    }
+    events.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
+    let firstObserved;
+    let observed = 0;
+    for (let i = 0; i < events.length; i++) {
+        if (events[i][1] === EventType.onObserve) {
+            if (observed === 0) {
+                firstObserved = events[i][0];
+            }
+            observed++;
+        }
+        if (events[i][1] === EventType.offObserve) {
+            observed--;
+            if (observed === 0) {
+                result -= events[i][0] - firstObserved + 1;
+            }
+        }
+    }
 
     return result;
 }
@@ -46,7 +75,7 @@ function solve() {
     const M = params[1];
 
     const desks = [];
-    for (let i = 0; i < N; i++) {
+    for (let i = 0; i < M; i++) {
         desks.push(readArray());
     }
 
