@@ -37,6 +37,8 @@ rl.on("line", (line) => {
         }
     }
 }).on("close", () => {
+    throw Error("is not test 1");
+
     // process.exit(0);
 });
 
