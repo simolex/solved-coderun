@@ -5,11 +5,17 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     crlfDelay: Infinity,
-    prompt: ""
+    prompt: "",
 });
 
 let start = false;
 let curLine;
+
+const getDistance = (password) => {
+    let currentDistance;
+    console.log(password);
+    //need get Distance
+};
 
 rl.on("line", (line) => {
     curLine = line.toString().trim();
