@@ -27,16 +27,32 @@
  * Примечания:
  */
 
-function SNTP(a, b, c) {
-    const timeA = new Date(`1970-01-01T${a}.000Z`);
-    const timeB = new Date(`1970-01-01T${b}.000Z`);
-    const timeC = new Date(`1970-01-02T${c}.000Z`);
-    const oneDay = new Date(`1970-01-02T00:00:00.000Z`);
+function conveyor(tests) {
+    return tests.map((test) => {
+        const stack = [];
+        const localResult = [];
 
-    const rangeTime = (timeC.getTime() - timeA.getTime()) % oneDay.getTime();
-    const resultTime = new Date(timeB.getTime() + Math.round(rangeTime / 2) + 500);
+        for (let i = 0; i < test.length; i++) {
+            if (stack.length > 0 && stack[stack.length - 1] < test[i]) {
+                while (stack[stack.length - 1] <= test[i]) {
+                    localResult.push(stack.pop());
+                }
+            }
+            stack.push(test[i]);
+        }
 
-    return resultTime.toISOString().substring(11, 19);
+        while (stack.length > 0) {
+            localResult.push(stack.pop());
+        }
+
+        for (let i = 1; i < localResult.length; i++) {
+            if (localResult[i - 1] > localResult[i]) {
+                return 0;
+            }
+        }
+
+        return 1;
+    });
 }
 
 const _readline = require("readline");
@@ -55,13 +71,15 @@ _reader.on("line", (line) => {
 process.stdin.on("end", solve);
 
 function solve() {
-    const a = readString();
-    const b = readString();
-    const c = readString();
+    const n = readInt();
+    const tests = [];
+    for (let i = 0; i < n; i++) {
+        tests[i] = readArray();
+        tests[i].shift();
+    }
+    const result = conveyor(tests);
 
-    const result = SNTP(a, b, c);
-
-    console.log(result);
+    console.log(result.join("\n"));
 }
 
 function readAllString() {
@@ -123,4 +141,4 @@ function readEdges(n) {
     return grid;
 }
 
-module.exports = SNTP;
+module.exports = conveyor;
