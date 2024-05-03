@@ -3,9 +3,9 @@ push 14
 size
 clear
 push 1
-back
+front
 push 2
-back
+front
 pop
 size
 pop
