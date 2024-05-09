@@ -1,4 +1,4 @@
-module.exports = function (participants, sports) {
+module.exports = function ({ participants, sports }) {
     /**
      * Подобно оператору new создает экземпляр объекта,
      * используя функцию-конструктор и параметры для нее
