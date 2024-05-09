@@ -15,7 +15,7 @@
 
 function sumOfCubes(n) {
     const dp = new Uint8Array(n + 1);
-    dp[0] = 10 ** 8;
+    dp[0] = 2 ** 8 - 1;
     dp[1] = 1;
     const cubes = [1];
     for (let k = 1; k <= Math.ceil(Math.pow(n, 1 / 3)); k++) {
