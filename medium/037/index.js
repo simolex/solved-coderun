@@ -35,16 +35,13 @@ function buyTickets(n, checkoutSpeed) {
         const steps = i < 3 ? i : 3;
         dp[i] = Number.POSITIVE_INFINITY;
         for (let j = 1; j <= steps; j++) {
-           
-            if (dp[i] > dp[i - j] + checkoutSpeed[i - j][j-1]) {
-                dp[i] = dp[i - j] + checkoutSpeed[i - j][j-1];
+            if (dp[i] > dp[i - j] + checkoutSpeed[i - j][j - 1]) {
+                dp[i] = dp[i - j] + checkoutSpeed[i - j][j - 1];
             }
         }
     }
 
-    
-
-    return n === 1 ? 1 : dp[n]; //need Test
+    return dp[n];
 }
 
 const _readline = require("readline");
@@ -69,7 +66,6 @@ function solve() {
     for (let i = 0; i < n; i++) {
         checkoutSpeed.push(readArray());
     }
-    console.log(checkoutSpeed);
 
     const result = buyTickets(n, checkoutSpeed);
 
