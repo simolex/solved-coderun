@@ -25,7 +25,6 @@
  * Примечания:
  *
  */
-
 function buyTickets(n, checkoutSpeed) {
     const dp = [];
     const buyed = [];
@@ -36,16 +35,16 @@ function buyTickets(n, checkoutSpeed) {
         const steps = i < 3 ? i : 3;
         dp[i] = Number.POSITIVE_INFINITY;
         for (let j = 1; j <= steps; j++) {
-            console.log(i, j, dp[i - j] + checkoutSpeed[i - 1][j - 1]);
-            if (dp[i] > dp[i - j] + checkoutSpeed[i - 1][j - 1]) {
-                dp[i] = dp[i - j] + checkoutSpeed[i - 1][j - 1];
+           
+            if (dp[i] > dp[i - j] + checkoutSpeed[i - j][j-1]) {
+                dp[i] = dp[i - j] + checkoutSpeed[i - j][j-1];
             }
         }
     }
 
-    console.log(dp);
+    
 
-    return n === 1 ? 1 : dp[n];
+    return n === 1 ? 1 : dp[n]; //need Test
 }
 
 const _readline = require("readline");
