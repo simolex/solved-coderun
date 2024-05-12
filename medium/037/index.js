@@ -27,7 +27,6 @@
  */
 function buyTickets(n, checkoutSpeed) {
     const dp = [];
-    const buyed = [];
 
     dp[0] = 0;
 
