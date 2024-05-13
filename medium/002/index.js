@@ -20,28 +20,21 @@
 
 function cheapestWay(n, m, weights) {
     const dp = [];
+    const delta = [
+        [-1, 0],
+        [0, -1]
+    ];
 
-    for (let i = 0; i <= n; i++) {
-        if (i === 0) {
-            dp.push(Array(m + 1).fill(Number.POSITIVE_INFINITY));
-            continue;
-        }
-
+    dp.push(Array(m + 1).fill(Number.POSITIVE_INFINITY));
+    for (let i = 1; i <= n; i++) {
         dp.push(Array(m + 1).fill(0));
         dp[i][0] = Number.POSITIVE_INFINITY;
     }
-
-    const delta = [
-        [-1, 0],
-        [0, -1],
-    ];
+    dp[1][0] = 0;
+    dp[0][1] = 0;
 
     for (let i = 1; i <= n; i++) {
         for (let j = 1; j <= m; j++) {
-            if (i === 1 && j === 1) {
-                dp[i][j] = weights[i - 1][j - 1];
-                continue;
-            }
             dp[i][j] =
                 weights[i - 1][j - 1] +
                 delta.reduce(
@@ -57,7 +50,7 @@ function cheapestWay(n, m, weights) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
