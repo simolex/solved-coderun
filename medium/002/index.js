@@ -22,7 +22,7 @@ function cheapestWay(n, m, weights) {
     const dp = [];
 
     for (let i = 0; i <= n; i++) {
-        if ((i = 0)) {
+        if (i === 0) {
             dp.push(Array(m + 1).fill(Number.POSITIVE_INFINITY));
             continue;
         }
@@ -50,8 +50,6 @@ function cheapestWay(n, m, weights) {
                 );
         }
     }
-
-    console.log(dp);
 
     return dp[n][m];
 }
