@@ -30,23 +30,72 @@
 
 function cafe(n, lunchByDays) {
     const dp = []; // day\coupon
-    const maxCoupons = lunchByDays.reduce((count, price) => count + (price > 100 ? 1 : 0), 0);
+    const spended = [];
+    const maybeCoupon = [0];
+    const maxCoupons = lunchByDays.reduce((count, price, i) => {
+        maybeCoupon[i + 1] = price > 100 ? 1 : 0;
+        return count + maybeCoupon[i + 1];
+    }, 0);
 
     dp.push(Array(maxCoupons + 1).fill(Number.POSITIVE_INFINITY));
     dp[0][0] = 0;
 
     let nowCoupons = 0;
     for (let i = 1; i <= n; i++) {
-        for (let j = 0; j <= nowCoupons; j++) {}
+        dp.push(Array(maxCoupons + 1).fill(Number.POSITIVE_INFINITY));
+        for (let j = 0; j <= maxCoupons; j++) {
+            if (dp[i][j] > dp[i - 1][j] + lunchByDays[i - 1]) {
+                dp[i][j] = dp[i - 1][j] + lunchByDays[i - 1];
+            }
+        }
+
+        for (let j = 1; j <= maxCoupons; j++) {
+            if (dp[i - 1][j] < dp[i][j - 1]) {
+                dp[i][j - 1] = dp[i - 1][j];
+            }
+        }
+
+        if (lunchByDays[i - 1] > 100) {
+            for (let j = 0; j < maxCoupons; j++) {
+                if (dp[i - 1][j] + lunchByDays[i - 1] < dp[i][j + 1]) {
+                    dp[i][j + 1] = dp[i - 1][j] + lunchByDays[i - 1];
+                }
+            }
+        }
     }
 
-    return [0, [], []];
+    let indexMin = maxCoupons;
+    for (let j = maxCoupons; j >= 0; j--) {
+        if (dp[n][j] < dp[n][indexMin]) {
+            indexMin = j;
+        }
+    }
+
+    nowCoupons = indexMin;
+    let max = 0;
+    for (let i = n; i > 0; i--) {
+        if (nowCoupons + 1 <= maxCoupons && dp[i - 1][nowCoupons + 1] === dp[i][nowCoupons]) {
+            if (lunchByDays[i - 1] > 0) {
+                nowCoupons++;
+                maybeCoupon[i] = 0;
+                spended.push(i);
+            }
+        } else if (nowCoupons - 1 >= 0 && dp[i - 1][nowCoupons - 1] + lunchByDays[i - 1] === dp[i][nowCoupons]) {
+            nowCoupons--;
+        }
+        max = Math.max(max, nowCoupons);
+    }
+    spended.reverse();
+
+    const countCoupons = maybeCoupon.reduce((a, v) => a + v, 0);
+
+    return [dp[n][0], [countCoupons - spended.length, spended.length], spended];
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
@@ -70,7 +119,7 @@ function solve() {
 
     console.log(result[0]);
     console.log(result[1].join(" "));
-    console.log(result[2]);
+    console.log(result[2].join("\n"));
 }
 
 function readAllString() {
