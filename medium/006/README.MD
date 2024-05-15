@@ -1,8 +1,8 @@
 # 6. НОП с восстановлением ответа
 
-[#dynamic programming 2D](#dynamic-programming-2D)
-[#coderun](#coderun)
-[#algorithm-training-3](#algorithm-training-3)
+<kbd>dynamic programming 2D</kbd>
+<kbd>coderun</kbd>
+<kbd>algorithm-training-3</kbd>
 
 Даны две последовательности, требуется найти и вывести их наибольшую общую подпоследовательность.
 
