@@ -1,4 +1,4 @@
-# 6. НОП с восстановлением ответа
+# НОП с восстановлением ответа
 
 [<kbd>dynamic programming 2D</kbd>](https://youtube.com/live/U8gzm92fprI)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/nop-with-response-recovery)

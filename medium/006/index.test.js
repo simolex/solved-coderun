@@ -1,6 +1,6 @@
 const solution = require(".");
 
-describe("6. НОП с восстановлением ответа", () => {
+describe("НОП с восстановлением ответа", () => {
     test("test-1", () => {
         const result = solution([1, 2, 3], [2, 3, 1]);
         expect(result).toEqual([2, 3]);
