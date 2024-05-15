@@ -50,8 +50,8 @@
 3 
 2 3 1
 </code></pre></td>
-<td><pre><code>
-1
+<td><pre>
+<code>1
 </code></pre></td>
 </tr>
 </table>
