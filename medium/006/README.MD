@@ -37,14 +37,14 @@
 <th>Ввод</th> <th>Вывод</th>
 </tr>
 <tr valign="top">
-<td><pre>
+<td><pre><code>
 3
 1 2 3
 3 
 2 3 1
-</pre></td>
-<td><pre>
+</code></pre></td>
+<td><pre><code>
 1
-</pre></td>
+</code></pre></td>
 </tr>
 </table>
