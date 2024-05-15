@@ -1,8 +1,8 @@
 # 6. НОП с восстановлением ответа
 
-<kbd>dynamic programming 2D</kbd>
-<kbd>coderun</kbd>
-<kbd>algorithm-training-3</kbd>
+<kbd>[dynamic programming 2D](https://youtube.com/live/U8gzm92fprI)</kbd>
+<kbd>[coderun](https://coderun.yandex.ru/problem/nop-with-response-recovery)</kbd>
+<kbd>[algorithm-training](https://contest.yandex.ru/contest/45468/problems/30)</kbd>
 
 Даны две последовательности, требуется найти и вывести их наибольшую общую подпоследовательность.
 
@@ -60,4 +60,4 @@
 </tr>
 </table>
 
-<md>#javascript<md>
+<kbd>javascript</kbd>
