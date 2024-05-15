@@ -18,27 +18,34 @@
 
 Требуется вывести наибольшую общую подпоследовательность данных последовательностей, через пробел.
 
-## Пример 1
+### Пример 1
 
 <table width = "100%">
 <tr>
 <th>Ввод</th> <th>Вывод</th>
 </tr>
 <tr valign="top">
-<td><pre>3<br>1 2 3<br>3<br>2 3 1</pre></td>
- <td><pre>2 3</pre></td>
+<td><pre>
+<code>3
+1 2 3
+3
+2 3 1
+</code></pre></td>
+<td><pre>
+<code>2 3
+</code></pre></td>
 </tr>
 </table>
 
-## Пример 2
+### Пример 2
 
 <table width = "100%">
 <tr>
 <th>Ввод</th> <th>Вывод</th>
 </tr>
 <tr valign="top">
-<td><pre><code>
-3
+<td><pre>
+<code>3
 1 2 3
 3 
 2 3 1
