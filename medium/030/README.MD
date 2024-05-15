@@ -1,4 +1,4 @@
-Буратино
+Буратино  
 [<kbd>dynamic programming 1D</kbd>](https://youtu.be/H7lu6h8H9-4)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/buratino)
 [<kbd>algorithm-training</kbd>](https://contest.yandex.ru/contest/45469/problems/24/)
