@@ -1,4 +1,4 @@
-# Буратино
+# Увлекательная игра
 
 [<kbd>dynamic-programming-1D</kbd>](https://youtu.be/H7lu6h8H9-4)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/an-exciting-game)
