@@ -8,7 +8,7 @@ function game(n, a, b) {
     dp[1] = 0;
 
     if (n === 1) {
-        return Math.min(a, b);
+        return dp[n];
     }
 
     const min = Math.min(a, b);
