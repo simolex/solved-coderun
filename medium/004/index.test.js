@@ -1,14 +1,12 @@
 const solution = require(".");
 
-describe("3. Вывести маршрут максимальной стоимости", () => {
+describe("4. Ход конём", () => {
     test("test-1", () => {
-        const result = solution(5, 5, [
-            [9, 9, 9, 9, 9],
-            [3, 0, 0, 0, 0],
-            [9, 9, 9, 9, 9],
-            [6, 6, 6, 6, 8],
-            [9, 9, 9, 9, 9]
-        ]);
-        expect(result).toEqual(74, ["D", "D", "R", "R", "R", "R", "D", "D"]);
+        const result = solution(3, 2);
+        expect(result).toBe(1);
+    });
+    test("test-2", () => {
+        const result = solution(31, 34);
+        expect(result).toBe(293930);
     });
 });
