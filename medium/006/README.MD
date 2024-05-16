@@ -65,6 +65,22 @@
 </details>
 
 <details>
-<summary>Решение</summary>
-<kbd>javascript</kbd>
+<summary>Решение <kbd>javascript</kbd></summary>
+
+### 1. Установка зависимостей
+
+```bash
+npm install             # Установка зависимостей
+```
+
+### 2. Запуск тестирования решения в среде Jest[^1]
+
+```bash
+npm run test       # Unit-тестирование
+```
+
 </details>
+
+#### Ссылки на документацию
+
+[^1]: [Jest](https://jestjs.io/docs/getting-started)
