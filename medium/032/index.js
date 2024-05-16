@@ -4,53 +4,43 @@
 
 function knightMove_v2(n, m) {
     const dp = [];
+    for (let i = 0; i < n; i++) {
+        dp.push([]);
+    }
+
     const move = [
-        [-1, 2],
-        [1, 2],
-        [2, 1],
-        [2, -1],
+        [1, -2],
+        [-2, 1],
+        [-1, -2],
+        [-2, -1]
     ];
     const countMove = move.length;
 
-    // if ((n + m - 2) % 3 !== 0) {
-    //     return 0;
-    // }
+    const getValue = (ci, cj) => (ci >= 0 && ci < n && cj >= 0 && cj < m ? dp[ci][cj] : 0n);
 
-    for (let i = 0; i < n; i++) {
-        dp.push(Array(m).fill(0));
-    }
-    dp[0][0] = 1;
+    dp[0][0] = 1n;
 
-    const nextMove = [[0, 0]];
+    for (let i = 2; i < n + m; i++) {
+        const from = Math.max(0, i - n);
+        const to = Math.min(i, m);
+        for (let j = from; j < to; j++) {
+            const ii = i - j - 1;
+            dp[ii][j] = 0n;
+            for (let k = 0; k < countMove; k++) {
+                di = ii + move[k][0];
+                dj = j + move[k][1];
 
-    let i, j;
-    let nextPtr = 0;
-    const hash = new Set();
-    while (nextMove.length > nextPtr) {
-        [i, j] = nextMove[nextPtr];
-        nextPtr++;
-        for (let k = 0; k < countMove; k++) {
-            const di = i + move[k][0];
-            const dj = j + move[k][1];
-            const hashIJ = JSON.stringify([di, dj]);
-
-            if (di >= 0 && di < n && di >= 0 && dj < m) {
-                if (!hash.has(hashIJ)) {
-                    hash.add(hashIJ);
-                    nextMove.push([di, dj]);
-                }
-                dp[di][dj] += dp[i][j];
+                dp[ii][j] += getValue(di, dj);
             }
         }
     }
-
-    return dp[n - 1][m - 1];
+    return dp[n - 1][m - 1].toString();
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];

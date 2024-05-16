@@ -1,4 +1,4 @@
-# Ход конём v2
+# Ход конём - 2
 
 [<kbd>dynamic programming 2D</kbd>](https://youtube.com/live/U8gzm92fprI)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/knights-move-2)
