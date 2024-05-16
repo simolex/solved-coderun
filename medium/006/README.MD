@@ -76,7 +76,7 @@ npm install             # Установка зависимостей
 ### 2. Запуск тестирования решения в среде Jest[^1]
 
 ```bash
-npm run test       # Unit-тестирование
+npm run test            # Unit-тестирование
 ```
 
 </details>
