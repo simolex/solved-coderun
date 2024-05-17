@@ -1,6 +1,6 @@
 # Поиск в глубину
 
-[<kbd>dynamic programming 2D</kbd>](https://youtube.com/live/U8gzm92fprI)
+[<kbd>dfs</kbd>](https://youtube.com/live/0YjdZlgf9Ig)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/search-in-depth)
 [<kbd>algorithm-training</kbd>](https://contest.yandex.ru/contest/45468/problems/31/)
 
@@ -39,26 +39,6 @@
 </code></pre></td>
 </tr>
 </table>
-
-### Пример 2
-
-<table width = "100%">
-<tr>
-<th>Ввод</th> <th>Вывод</th>
-</tr>
-<tr valign="top">
-<td><pre>
-<code>100 3
-15 50 75
-</code></pre></td>
-
-<td><pre>
-<code>200
-</code></pre></td>
-</tr>
-</table>
-
-## Примечания
 
 </details>
 
