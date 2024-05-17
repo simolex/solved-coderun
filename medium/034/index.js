@@ -1,40 +1,33 @@
 /**
- * 33. Расстояние по Левенштейну
+ * 34. Космический мусорщик
  */
 
-function subsequence(sequence_1, sequence_2) {
-    const dp = [];
-    const n = sequence_1.length;
-    const m = sequence_2.length;
+function spaceScavenger(rules, command, repeat) {
+    let result = 0;
+    dp = [];
 
-    const delta = [
-        [-1, 0],
-        [0, -1],
-    ];
+    for (const key in rules) {
+        dp[key] = Array(repeat + 1).fill(0);
+    }
 
-    dp.push(
-        Array(m + 1)
-            .fill(null)
-            .map((_, i) => i)
-    );
+    for (let i = 0; i < command.length; i++) {
+        dp[command.charAt(i)][0]++;
+    }
 
-    for (let i = 1; i <= n; i++) {
-        dp.push([]);
-        dp[i][0] = i;
-        for (let j = 1; j <= m; j++) {
-            if (sequence_1.charAt(i - 1) === sequence_2.charAt(j - 1)) {
-                dp[i][j] = dp[i - 1][j - 1];
-            } else {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
+    for (let i = 1; i <= repeat; i++) {
+        for (const move in rules) {
+            result += dp[move][i - 1];
+
+            if (i < repeat) {
+                const nextCommand = rules[move];
+                for (let j = 0; j < nextCommand.length; j++) {
+                    dp[nextCommand.charAt(j)][i] += dp[move][i - 1];
+                }
             }
-            dp[i][j] = delta.reduce(
-                (min, p) => (dp[i + p[0]][j + p[1]] + 1 < min ? dp[i + p[0]][j + p[1]] + 1 : min),
-                dp[i][j]
-            );
         }
     }
 
-    return dp[n][m];
+    return result;
 }
 
 const _readline = require("readline");
@@ -53,10 +46,17 @@ _reader.on("line", (line) => {
 process.stdin.on("end", solve);
 
 function solve() {
-    const string_1 = readString();
-    const string_2 = readString();
+    const template = ["N", "S", "W", "E", "U", "D"];
+    const rules = template.reduce((obj, direction) => {
+        obj[direction] = readString();
+        return obj;
+    }, {});
 
-    const result = subsequence(string_1, string_2);
+    const params = readStringArray();
+    const command = params[0];
+    const repeats = Number(params[1]);
+
+    const result = spaceScavenger(rules, command, repeats);
 
     console.log(result);
 }
@@ -121,4 +121,4 @@ function readEdges(n) {
     return grid;
 }
 
-module.exports = subsequence;
+module.exports = spaceScavenger;
