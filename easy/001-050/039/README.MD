@@ -1,4 +1,4 @@
-# Топологическая сортировка
+# Откуда достижима первая вершина
 
 [<kbd>dfs</kbd>](https://youtube.com/live/0YjdZlgf9Ig)
 [<kbd>coderun</kbd>](https://coderun.yandex.ru/problem/first-vertex)
