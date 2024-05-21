@@ -2,18 +2,42 @@
  * 41. Десант
  */
 
+const colorType = {
+    noVisited: 0,
+    inFlow: 1,
+    outFlow: 2,
+    unknown: 3,
+};
+
+const move = [
+    { delta: [0, 1] },
+    // { delta: [1, 1] },
+    { delta: [1, 0] },
+    // { delta: [1, -1] },
+    { delta: [0, -1] },
+    // { delta: [-1, -1] },
+    { delta: [-1, 0] },
+    // { delta: [-1, 1] },
+];
+
 function troop(n, m, mapHeights) {
     let result = 0;
     const map = [];
-    const color = Array(n + 2)
+    let color = [];
+
+    color.push(Array(m + 2).fill(colorType.outFlow));
+    Array(n)
         .fill(null)
-        .map((_) => Array(m + 2).fill(-1));
-    const move = [
-        [0, 1],
-        [1, 0],
-        [0, -1],
-        [-1, 0],
-    ];
+        .map((_) =>
+            color.push(
+                Array(m + 2)
+                    .fill(colorType.noVisited)
+                    .fill(colorType.outFlow, 0, 1)
+                    .fill(colorType.outFlow, -1)
+            )
+        );
+    color.push(Array(m + 2).fill(colorType.outFlow));
+
     let stack = [];
 
     map.push(Array(m + 2).fill(20000));
@@ -27,29 +51,109 @@ function troop(n, m, mapHeights) {
     }
     map.push(Array(m + 2).fill(20000));
 
-    console.log(color, map);
+    let preResult = [];
 
-    // const stack = [{ r, c }];
+    let rMin, cMin;
 
-    while (stack.length > 0) {
-        const { r, c } = stack.pop();
-        if (listEdges[r][c] === "*") {
-            continue;
-        }
+    for (let r = 1; r <= n + 1; r++) {
+        for (let c = 1; c <= m + 1; c++) {
+            if (color[r][c] === colorType.noVisited) {
+                result++;
+                stack = [{ r, c }];
+                rMin = 0;
+                cMin = 0;
 
-        listEdges[r][c] = "*";
-        result++;
+                while (stack.length > 0) {
+                    const { r, c } = stack.pop();
+                    if (color[r][c] > colorType.noVisited) {
+                        continue;
+                    }
 
-        move.forEach((d) => {
-            const rd = r + d[0];
-            const cd = c + d[1];
-            if (listEdges[rd][cd] === ".") {
-                stack.push({ r: rd, c: cd });
+                    color[r][c] = result;
+                    if (map[rMin][cMin] > map[r][c]) {
+                        rMin = r;
+                        cMin = c;
+                    }
+                    move.forEach(({ delta }) => {
+                        const rd = r + delta[0];
+                        const cd = c + delta[1];
+
+                        if (
+                            rd > 0 &&
+                            cd > 0 &&
+                            rd <= n &&
+                            cd <= m &&
+                            color[rd][cd] === colorType.noVisited &&
+                            map[r][c] <= map[rd][cd]
+                        ) {
+                            stack.push({ r: rd, c: cd });
+                        }
+                    });
+                }
+                preResult.push({ r: rMin, c: cMin });
             }
-        });
+        }
     }
 
-    return 0;
+    preResult.sort((a, b) => map[b.r][b.c] - map[a.r][a.c]);
+
+    color = [];
+    color.push(Array(m + 2).fill(colorType.outFlow));
+    Array(n)
+        .fill(null)
+        .map((_) =>
+            color.push(
+                Array(m + 2)
+                    .fill(colorType.noVisited)
+                    .fill(colorType.outFlow, 0, 1)
+                    .fill(colorType.outFlow, -1)
+            )
+        );
+    color.push(Array(m + 2).fill(colorType.outFlow));
+
+    for (let i = 0; i < preResult.length; i++) {
+        const { r, c } = preResult[i];
+        if (color[r][c] === colorType.noVisited) {
+            result++;
+            stack = [{ r, c }];
+            rMin = 0;
+            cMin = 0;
+
+            while (stack.length > 0) {
+                const { r, c } = stack.pop();
+                if (color[r][c] === result) {
+                    continue;
+                }
+
+                color[r][c] = result;
+
+                move.forEach(({ delta }) => {
+                    const rd = r + delta[0];
+                    const cd = c + delta[1];
+
+                    if (
+                        rd > 0 &&
+                        cd > 0 &&
+                        rd <= n &&
+                        cd <= m &&
+                        color[rd][cd] < color[r][c] &&
+                        map[r][c] <= map[rd][cd]
+                    ) {
+                        stack.push({ r: rd, c: cd });
+                    }
+                });
+            }
+        }
+    }
+
+    result = new Set();
+    for (let r = 1; r <= n; r++) {
+        for (let c = 1; c <= m; c++) {
+            result.add(color[r][c]);
+        }
+    }
+
+    return result.size;
 }
 
 const _readline = require("readline");
