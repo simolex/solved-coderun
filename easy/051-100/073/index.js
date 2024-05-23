@@ -5,8 +5,14 @@
 function equationSystem(a, b, c, d, e, f) {
     const result = [];
     const D = a * d - b * c;
+    const Dx = e * d - f * b;
+    const Dy = f * a - e * c;
+    const zeroFirst = a === b && a === 0 && e !== 0;
+    const zeroSecond = c === d && c === 0 && f !== 0;
     if (D !== 0) {
-        return [2, (e * d - f * b) / D, (f * a - e * c) / D];
+        return [2, Dx / D, Dy / D];
+    } else if (D !== Dx || D !== Dy) {
+        return [5];
     }
 }
 
