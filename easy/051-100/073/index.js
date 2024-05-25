@@ -9,6 +9,44 @@ function equationSystem(a, b, c, d, e, f) {
     const Dy = f * a - e * c;
     const zeroFirst = a === b && a === 0 && e !== 0;
     const zeroSecond = c === d && c === 0 && f !== 0;
+
+    const L = [];
+    const U = [];
+
+    for (let k = 0; k < 2; k++) {
+        L[k] = Array(2).fill(0);
+        U[k] = Array(2);
+    }
+    U[0][0] = a;
+    U[0][1] = b;
+    U[1][0] = c;
+    U[1][1] = d;
+
+    console.table(U);
+
+    for (let i = 0; i < 2; i++) {
+        for (let j = i; j < 2; j++) {
+            L[j][i] = U[j][i] / U[i][i];
+        }
+    }
+
+    for (let k = 1; k < 2; k++) {
+        for (let i = k - 1; i < 2; i++) {
+            for (let j = i; j < 2; j++) {
+                L[j][i] = U[j][i] / U[i][i];
+            }
+        }
+
+        for (let i = k; i < 2; i++) {
+            for (let j = k - 1; j < 2; j++) {
+                U[i][j] = U[i][j] - L[i][k - 1] * U[k - 1][j];
+            }
+        }
+    }
+
+    console.table(L);
+    console.table(U);
+
     if (D !== 0) {
         return [2, Dx / D, Dy / D];
     } else if (D !== Dx || D !== Dy) {
