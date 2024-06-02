@@ -2,6 +2,71 @@
  * 42. Кружки в Маховниках
  */
 
+class MinHeap {
+    constructor(initValues) {
+        if (initValues) {
+            this.values = initValues;
+            const lastElementWithChilds = Math.floor(initValues.length / 2) - 1;
+            for (let i = lastElementWithChilds; i >= 0; i--) {
+                this._balancing(i);
+            }
+        } else this.values = [];
+    }
+    push(element) {
+        this.values.push(element);
+        let index = this.values.length - 1;
+
+        while (index > 0) {
+            const current = this.values[index];
+            let parentIndex = Math.floor((index - 1) / 2);
+
+            if (this.values[parentIndex] > current) {
+                this.values[index] = this.values[parentIndex];
+                this.values[parentIndex] = current;
+                index = parentIndex;
+            } else break;
+        }
+    }
+    _balancing(index) {
+        const length = this.values.length;
+        while (index * 2 + 1 <= length - 1) {
+            const current = this.values[index];
+            let leftChildIndex = 2 * index + 1;
+            let rightChildIndex = 2 * index + 2;
+            let leftChild, rightChild;
+            let swap = null;
+            leftChild = this.values[leftChildIndex];
+            rightChild = this.values[rightChildIndex];
+
+            if (rightChildIndex === length) {
+                swap = leftChild;
+            }
+            swap = swap === null && rightChild <= leftChild ? rightChildIndex : leftChildIndex;
+            if (this.values[swap] < current) {
+                this.values[index] = this.values[swap];
+                this.values[swap] = current;
+                index = swap;
+            } else break;
+        }
+    }
+    pop() {
+        let index = 0;
+        const min = this.values[index];
+        this.values[index] = this.values[this.values.length - 1];
+
+        this._balancing(index);
+        this.values.pop();
+        return min;
+    }
+
+    getValues() {
+        return this.values;
+    }
+    getSize() {
+        return this.values.length;
+    }
+}
+
 class MaxHeap {
     constructor(initValues) {
         if (initValues) {
@@ -12,7 +77,7 @@ class MaxHeap {
             }
         } else this.values = [];
     }
-    add(element) {
+    push(element) {
         this.values.push(element);
         let index = this.values.length - 1;
 
@@ -49,7 +114,7 @@ class MaxHeap {
             } else break;
         }
     }
-    getMax() {
+    pop() {
         let index = 0;
         const max = this.values[index];
         this.values[index] = this.values[this.values.length - 1];
@@ -72,13 +137,19 @@ function topSorting(n, needClubs) {
         .map((v) => new Set());
     const visited = Array(n + 1).fill(-1);
 
+    const listEdgesReverse = Array(n + 1)
+        .fill(null)
+        .map((v) => new Set());
+
     let k;
     for (let i = 0; i < n; i++) {
         k = needClubs[i][0];
         for (let j = 1; j <= k; j++) {
             listEdges[i + 1].add(needClubs[i][j]);
+            listEdgesReverse[needClubs[i][j]].add(i + 1);
         }
     }
+    listEdges.forEach((v, i) => console.log(`${i}: ${[...v.values()].join()}`));
 
     for (let i = 1; i <= n; i++) {
         const heap = new MaxHeap([...listEdges[i].values()]);
@@ -104,7 +175,7 @@ function topSorting(n, needClubs) {
                 visited[v] = 1;
 
                 while (listEdges[v].getSize() > 0) {
-                    const vertex = listEdges[v].getMax();
+                    const vertex = listEdges[v].pop();
                     if (v !== vertex && visited[vertex] === 1) {
                         return [];
                     }
@@ -115,6 +186,8 @@ function topSorting(n, needClubs) {
             }
         }
     }
+    // console.dir(listEdgesReverse, { maxArrayLength: null });
+    listEdgesReverse.forEach((v, i) => console.log(`${i}: ${[...v.values()].join()}`));
 
     // result.reverse();
     return result;
@@ -123,7 +196,7 @@ function topSorting(n, needClubs) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
