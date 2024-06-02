@@ -1,18 +1,19 @@
-class MinMultiHeap {
-    constructor(initValues) {
-        this.dictionary = new Map();
-
-        if (initValues) {
-            this.values = initValues;
-            this.values.forEach((v, i) => (this.dictionary[v.position] = i));
-            const lastElementWithChilds = Math.floor(initValues.length / 2) - 1;
-            for (let i = lastElementWithChilds; i >= 0; i--) {
-                this._siftDown(i);
-            }
-        } else this.values = [];
+class HeapInplace {
+    size;
+    constructor(array, k) {
+        this.dictionary = Array(array.length)
+            .fill(null)
+            .map((_, i) => i);
+        this._head = 0;
+        this._size = k;
+        this._values = array;
+        const lastElementWithChilds = Math.floor(this._size / 2) - 1;
+        for (let i = this._head + lastElementWithChilds; i >= this._head; i--) {
+            this._siftDown(i);
+        }
     }
 
-    add(value) {
+    shift(value) {
         let index;
 
         if (!this.dictionary.has(value)) {
@@ -93,12 +94,13 @@ class MinMultiHeap {
     }
 
     _swapItems(index_1, index_2) {
-        const current = this.values[index_1];
+        const currentValue = this.values[index_1];
         this.values[index_1] = this.values[index_2];
-        this.values[index_2] = current;
+        this.values[index_2] = currentValue;
 
-        this.dictionary.set(this.values[index_1].value, index_1);
-        this.dictionary.set(this.values[index_2].value, index_2);
+        const currentIndex = this.dictionary[index_1];
+        this.dictionary[index_1] = this.dictionary[index_2];
+        this.dictionary[index_2] = currentIndex;
     }
 
     _siftUp(index) {
@@ -114,7 +116,7 @@ class MinMultiHeap {
 
     _siftDown(index) {
         const length = this.values.length;
-        while (index * 2 + 1 < length - 1) {
+        while (index * 2 + 1 <= length - 1) {
             let leftChildIndex = 2 * index + 1;
             let rightChildIndex = 2 * index + 2;
             let leftChild, rightChild;
@@ -126,7 +128,7 @@ class MinMultiHeap {
                 swap = leftChild;
             }
             swap =
-                this._getKey(rightChild) <= this._getKey(leftChild) && swap === null ? rightChildIndex : leftChildIndex;
+                swap === null && this._getKey(rightChild) <= this._getKey(leftChild) ? rightChildIndex : leftChildIndex;
             if (this._getKey(this.values[swap]) < this._getKey(this.values[index])) {
                 this._swapItems(index, swap);
                 index = swap;
