@@ -37,7 +37,7 @@ const listTokenType = {
     PLUS: new TokenType("PLUS", "\\+"),
     MINUS: new TokenType("MINUS", "\\-"),
     MULTIPLICATION: new TokenType("MULTIPLICATION", "\\*"),
-    // DIVISION: new TokenType("DIVISION", "\\\\"),
+    DIVISION: new TokenType("DIVISION", "\\\\"),
     OPEN_PARENTHESIS: new TokenType("OPEN_PARENTHESIS", "\\("),
     CLOSE_PARENTHESIS: new TokenType("CLOSE_PARENTHESIS", "\\)"),
     SPACE: new TokenType("SPACE", "[ \\n\\t\\r]")
