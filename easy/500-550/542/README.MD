@@ -1,4 +1,4 @@
-# Топологическая сортировка
+# Нужно больше конфет!
 
 [<kbd>sort</kbd>](https://coderun.yandex.ru/catalog?tag=sort)
 [<kbd>algorithms</kbd>](https://coderun.yandex.ru/catalog?tag=algorithms)
