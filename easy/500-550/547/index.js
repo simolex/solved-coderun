@@ -37,18 +37,26 @@ class CustomRandom {
 // }
 
 function linearPostman(n, a, b) {
-    const houses = new Uint32Array(n);
+    let houses = new Uint32Array(n);
     const custRand = new CustomRandom(a, b);
+    const uniqHouses = new Set();
 
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
     }
-    houses.sort((a, b) => a - b);
+
+    for (let i = 0; i < n; i++) {
+        uniqHouses.add(houses[i]);
+    }
+    houses = [...uniqHouses.values()];
+    // console.log(houses);
+
+    // houses.sort((a, b) => a - b);
 
     const getSumDistances = (y) => {
         let sum = 0;
         for (let i = 0; i < n; i++) {
-            sum += Math.abs(houses[i] - y);
+            sum += Math.abs(y - houses[i]);
         }
         return sum;
     };
@@ -57,17 +65,20 @@ function linearPostman(n, a, b) {
     let r = 2 ** 32;
     let m1, m2;
 
-    while (l < r) {
+    while (r - l > 9) {
         m1 = l + Math.floor((r - l) / 3);
         m2 = r - Math.floor((r - l) / 3);
-        if (getSumDistances(m1) <= getSumDistances(m2)) {
+        if (getSumDistances(m1) < getSumDistances(m2)) {
             r = m2 - 1;
         } else {
             l = m1 + 1;
         }
     }
+
     console.log(houses);
-    console.log(l, r, getSumDistances(r - 2), getSumDistances(r + 1), getSumDistances(r + 2));
+    for (let i = 0; i < n; i++) {
+        console.log(i, getSumDistances(houses[i]));
+    }
     return getSumDistances(r);
 }
 
