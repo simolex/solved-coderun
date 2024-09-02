@@ -7,22 +7,23 @@ class CustomRandom {
     #a;
     #b;
     constructor(a, b) {
-        this.#cur = new Uint32Array(1).fill(0);
-        this.#a = new Uint32Array(2).fill(a);
-        this.#b = new Uint32Array(2).fill(b);
+        this.#cur = 0n;
+        this.#a = BigInt(a);
+        this.#b = BigInt(b);
+        // this.mask = (1 << 32) - 1;
     }
 
     #nextRand24() {
-        this.#cur[0] = this.#cur[0] * this.#a[0] + this.#b[0];
+        this.#cur = (((this.#cur * this.#a) % 2n ** 32n) + this.#b) % 2n ** 32n;
 
-        return this.#cur[0] >> 8;
+        return (this.#cur >> 8n) % 2n ** 32n;
     }
 
     nextRand32() {
-        this.#a[1] = this.#nextRand24();
-        this.#b[1] = this.#nextRand24();
+        const a = this.#nextRand24();
+        const b = this.#nextRand24();
 
-        return (this.#a[1] << 8) ^ this.#b[1];
+        return Number((((a << 8n) ^ b) % 2n ** 32n).toString());
     }
 }
 
@@ -39,19 +40,10 @@ class CustomRandom {
 function linearPostman(n, a, b) {
     let houses = new Uint32Array(n);
     const custRand = new CustomRandom(a, b);
-    const uniqHouses = new Set();
 
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
     }
-
-    for (let i = 0; i < n; i++) {
-        uniqHouses.add(houses[i]);
-    }
-    houses = [...uniqHouses.values()];
-    // console.log(houses);
-
-    // houses.sort((a, b) => a - b);
 
     const getSumDistances = (y) => {
         let sum = 0;
@@ -63,11 +55,13 @@ function linearPostman(n, a, b) {
 
     let l = 0;
     let r = 2 ** 32;
-    let m1, m2;
+    let m, mM;
+    let mL = getSumDistances(l);
+    let mR = getSumDistances(r);
 
-    while (r - l > 9) {
-        m1 = l + Math.floor((r - l) / 3);
-        m2 = r - Math.floor((r - l) / 3);
+    while (l < r) {
+        m = l + Math.floor((r - l) / 2);
+        mM = getSumDistances(m);
         if (getSumDistances(m1) < getSumDistances(m2)) {
             r = m2 - 1;
         } else {
@@ -75,17 +69,13 @@ function linearPostman(n, a, b) {
         }
     }
 
-    console.log(houses);
-    for (let i = 0; i < n; i++) {
-        console.log(i, getSumDistances(houses[i]));
-    }
-    return getSumDistances(r);
+    return getSumDistances(l);
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
