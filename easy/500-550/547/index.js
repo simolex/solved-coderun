@@ -42,7 +42,7 @@ function linearPostman(n, a, b) {
     // const st = Date.now();
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
-        houses[i] < 0 ? console.log(houses[i]) : null;
+        // houses[i] < 0 ? console.log(houses[i]) : null;
     }
     // console.log(Date.now() - st);
     // const s2 = Date.now();
@@ -99,24 +99,26 @@ function linearPostman(n, a, b) {
     let right = n;
     let select;
 
-    while (right - left > 0) {
-        select = partition(left, right, houses[right - 1]);
+    while (right > left) {
+        select = partition(left, right, houses[left]);
         // console.log(select);
-        console.log(left, right, select);
-        // if (select.equalPointer <= median && median < select.greatePointer) {
-        //     left = select.equalPointer;
-        //     break;
-        // }
-        if (houses[right] === houses[left] || left + 1 === right) {
+        // console.log(left, right, select);
+        if (select.equalPointer <= median && median < select.greatePointer) {
             left = select.equalPointer;
             break;
         }
-        if (select.equalPointer < median) {
+        if (houses[right - 1] === houses[left]) {
             left = select.equalPointer;
-        } else {
+            break;
+        }
+
+        if (select.greatePointer <= median) {
+            left = select.greatePointer + 1;
+        } else if (select.equalPointer >= median) {
             right = select.equalPointer;
         }
     }
+
     // console.log(houses);
 
     // console.log(getSumDistances(houses[left]), getSumDistances(houses[right]));
@@ -132,7 +134,7 @@ function linearPostman(n, a, b) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
