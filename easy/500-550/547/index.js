@@ -3,27 +3,26 @@
  */
 
 class CustomRandom {
-    #cur;
-    #a;
-    #b;
+    #buffer;
     constructor(a, b) {
-        this.#cur = 0n;
-        this.#a = BigInt(a);
-        this.#b = BigInt(b);
-        this.mask = 2n ** 32n;
+        this.#buffer = new Uint32Array(6);
+        this.#buffer[0] = 0;
+        this.#buffer[1] = a;
+        this.#buffer[2] = b;
     }
 
     #nextRand24() {
-        this.#cur = (((this.#cur * this.#a) % this.mask) + this.#b) % this.mask;
-
-        return (this.#cur >> 8n) % this.mask;
+        this.#buffer[0] *= this.#buffer[1];
+        this.#buffer[0] += this.#buffer[2];
+        return this.#buffer[0] >>> 8;
     }
 
     nextRand32() {
-        const a = this.#nextRand24();
-        const b = this.#nextRand24();
+        this.#buffer[4] = this.#nextRand24();
+        this.#buffer[5] = this.#nextRand24();
+        this.#buffer[3] = (this.#buffer[4] << 8) ^ this.#buffer[5];
 
-        return Number((((a << 8n) ^ b) % this.mask).toString());
+        return this.#buffer[3] & 0xffffffff;
     }
 }
 
@@ -40,20 +39,24 @@ class CustomRandom {
 function linearPostman(n, a, b) {
     let houses = new Uint32Array(n);
     const custRand = new CustomRandom(a, b);
-
+    // const st = Date.now();
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
+        houses[i] < 0 ? console.log(houses[i]) : null;
     }
+    // console.log(Date.now() - st);
+    // const s2 = Date.now();
 
     // const houses = [1, 2, 2, 2, 3, 3, 4, 5];
     // n = houses.length;
 
     const getSumDistances = (y) => {
-        let sum = 0;
+        let sum = 0n;
+        y = BigInt(y);
         for (let i = 0; i < n; i++) {
-            sum += Math.abs(y - houses[i]);
+            sum += y > BigInt(houses[i]) ? y - BigInt(houses[i]) : BigInt(houses[i]) - y;
         }
-        return sum;
+        return sum.toString();
     };
 
     const partition = (l, r, x) => {
@@ -61,69 +64,75 @@ function linearPostman(n, a, b) {
         let greatePointer = l;
         let newValue;
         for (let i = l; i < r; i++) {
-            if (houses[i] <= x) {
-                if (i !== greatePointer) {
-                    newValue = houses[i];
-                    houses[i] = houses[greatePointer];
-                    houses[greatePointer] = newValue;
-                }
-                greatePointer++;
+            newValue = houses[i];
+            switch (true) {
+                case houses[i] < x:
+                    if (i !== greatePointer) {
+                        houses[i] = houses[greatePointer];
+                    }
+                    if (greatePointer !== equalPointer) {
+                        houses[greatePointer] = houses[equalPointer];
+                    }
+                    if (equalPointer !== i) {
+                        houses[equalPointer] = newValue;
+                    }
+                    greatePointer++;
+                    equalPointer++;
+                    break;
+                case houses[i] === x:
+                    if (i !== greatePointer) {
+                        houses[i] = houses[greatePointer];
+                        houses[greatePointer] = newValue;
+                    }
+                    greatePointer++;
+                    break;
             }
-            // switch (true) {
-            //     case houses[i] < x:
-            //         if (i !== greatePointer) {
-            //             houses[i] = houses[greatePointer];
-            //         }
-            //         if (greatePointer !== equalPointer) {
-            //             houses[greatePointer] = houses[equalPointer];
-            //         }
-            //         if (equalPointer !== i) {
-            //             houses[equalPointer] = newValue;
-            //         }
-            //         greatePointer++;
-            //         equalPointer++;
-            //         break;
-            //     case houses[i] === x:
-            //         if (i !== greatePointer) {
-            //             houses[i] = houses[greatePointer];
-            //             houses[greatePointer] = newValue;
-            //         }
-            //         greatePointer++;
-            //         break;
-            // }
         }
         // console.log("part>>>", equalPointer, greatePointer);
-        return greatePointer;
+        return { equalPointer, greatePointer };
     };
+
+    // console.log(houses);
 
     const median = Math.floor(n / 2);
     let left = 0;
     let right = n;
-    let middle;
+    let select;
 
-    while (right > left) {
-        middle = partition(left, right, houses[left + Math.ceil((right - left) / 2)]);
-        if (middle > median) {
-            right = middle - 1;
-        } else {
-            left = middle;
+    while (right - left > 0) {
+        select = partition(left, right, houses[right - 1]);
+        // console.log(select);
+        console.log(left, right, select);
+        // if (select.equalPointer <= median && median < select.greatePointer) {
+        //     left = select.equalPointer;
+        //     break;
+        // }
+        if (houses[right] === houses[left] || left + 1 === right) {
+            left = select.equalPointer;
+            break;
         }
-        // console.log(left, right, middle);
+        if (select.equalPointer < median) {
+            left = select.equalPointer;
+        } else {
+            right = select.equalPointer;
+        }
     }
+    // console.log(houses);
+
     // console.log(getSumDistances(houses[left]), getSumDistances(houses[right]));
     // console.log(houses[left], houses[right]);
 
     // for (let i = 0; i < n; i++) {
     //     console.log(i, houses[i], getSumDistances(houses[i]));
     // }
-
+    // console.log(Date.now() - s2);
     return getSumDistances(houses[left]);
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
