@@ -94,29 +94,37 @@ function linearPostman(n, a, b) {
 
     // console.log(houses);
 
-    const median = Math.floor(n / 2);
+    let median = Math.floor(n / 2);
     let left = 0;
     let right = n;
     let select;
+    let size;
 
-    while (right > left) {
+    while (true) {
         select = partition(left, right, houses[left]);
-        // console.log(select);
-        // console.log(left, right, select);
-        if (select.equalPointer <= median && median < select.greatePointer) {
-            left = select.equalPointer;
-            break;
-        }
-        if (houses[right - 1] === houses[left]) {
-            left = select.equalPointer;
-            break;
-        }
+        size = left - select.greatePointer;
 
-        if (select.greatePointer <= median) {
-            left = select.greatePointer + 1;
-        } else if (select.equalPointer >= median) {
-            right = select.equalPointer;
+        // console.log(select);
+        console.log(median, left, right, select);
+        if (select.equalPointer === median) {
+            left = select.equalPointer - 1;
+            break;
+        } else if (select.equalPointer < median) {
+            left = select.greatePointer;
+        } else {
+            right = select.equalPointer - 1;
+            // median -= size;
         }
+        // if (houses[right - 1] === houses[left]) {
+        //     left = select.equalPointer;
+        //     break;
+        // }
+
+        // if (select.greatePointer <= median) {
+        //     left = select.greatePointer + 1;
+        // } else if (select.equalPointer >= median) {
+        //     right = select.equalPointer;
+        // }
     }
 
     // console.log(houses);
@@ -134,7 +142,7 @@ function linearPostman(n, a, b) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
