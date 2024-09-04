@@ -38,17 +38,33 @@ class CustomRandom {
 
 function linearPostman(n, a, b) {
     let houses = new Uint32Array(n);
+    let groups = new Uint32Array(2 ** 16);
+
+    let groupIndex = new Uint32Array(n);
+
     const custRand = new CustomRandom(a, b);
     // const st = Date.now();
+
+    let hash;
+    let pntRight = 0;
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
-        // houses[i] < 0 ? console.log(houses[i]) : null;
+        hash = houses[i] >>> 16;
+        groups[hash]++;
+        groupIndex[i] = hash;
     }
-    // console.log(Date.now() - st);
-    // const s2 = Date.now();
 
-    // const houses = [1, 2, 2, 2, 3, 3, 4, 5];
-    // n = houses.length;
+    const medianIndex = Math.floor((n - 1) / 2);
+    let sum = 0;
+    let index = 0;
+    let prevSum = 0;
+    while (index < 2 ** 16 && sum < medianIndex) {
+        prevSum = sum;
+        sum += groups[index];
+        index++;
+    }
+
+    console.log(groups, groupIndex, index - 1);
 
     const getSumDistances = (y) => {
         let sum = 0n;
@@ -58,85 +74,45 @@ function linearPostman(n, a, b) {
         }
         return sum.toString();
     };
+    let result;
 
-    const partition = (l, r, x) => {
-        let equalPointer = l;
-        let greatePointer = l;
-        let newValue;
+    const FindMedian = (l, r, bit) => {
+        if (l == r - 1 && l === medianIndex) {
+            result = houses[l];
+            return;
+        }
+        const mask = 1 << bit;
+
+        pntRight = l;
         for (let i = l; i < r; i++) {
-            newValue = houses[i];
-            switch (true) {
-                case houses[i] < x:
-                    if (i !== greatePointer) {
-                        houses[i] = houses[greatePointer];
-                    }
-                    if (greatePointer !== equalPointer) {
-                        houses[greatePointer] = houses[equalPointer];
-                    }
-                    if (equalPointer !== i) {
-                        houses[equalPointer] = newValue;
-                    }
-                    greatePointer++;
-                    equalPointer++;
-                    break;
-                case houses[i] === x:
-                    if (i !== greatePointer) {
-                        houses[i] = houses[greatePointer];
-                        houses[greatePointer] = newValue;
-                    }
-                    greatePointer++;
-                    break;
+            if ((houses[i] & mask) === 0) {
+                if (pntRight !== i) {
+                    value = houses[pntRight];
+                    houses[pntRight] = houses[i];
+                    houses[i] = value;
+                }
+                pntRight++;
             }
         }
-        // console.log("part>>>", equalPointer, greatePointer);
-        return { equalPointer, greatePointer };
+
+        if (bit === 0) {
+            result = houses[l];
+
+            return;
+        }
+
+        if (medianIndex >= pntRight) {
+            FindMedian(pntRight, r, bit - 1);
+        } else {
+            FindMedian(l, pntRight, bit - 1);
+        }
     };
 
-    // console.log(houses);
+    FindMedian(0, n, 31);
 
-    let median = Math.floor(n / 2);
-    let left = 0;
-    let right = n;
-    let select;
-    let size;
+    // console.log(pntRight, houses);
 
-    while (true) {
-        select = partition(left, right, houses[left]);
-        size = left - select.greatePointer;
-
-        // console.log(select);
-        console.log(median, left, right, select);
-        if (select.equalPointer === median) {
-            left = select.equalPointer - 1;
-            break;
-        } else if (select.equalPointer < median) {
-            left = select.greatePointer;
-        } else {
-            right = select.equalPointer - 1;
-            // median -= size;
-        }
-        // if (houses[right - 1] === houses[left]) {
-        //     left = select.equalPointer;
-        //     break;
-        // }
-
-        // if (select.greatePointer <= median) {
-        //     left = select.greatePointer + 1;
-        // } else if (select.equalPointer >= median) {
-        //     right = select.equalPointer;
-        // }
-    }
-
-    // console.log(houses);
-
-    // console.log(getSumDistances(houses[left]), getSumDistances(houses[right]));
-    // console.log(houses[left], houses[right]);
-
-    // for (let i = 0; i < n; i++) {
-    //     console.log(i, houses[i], getSumDistances(houses[i]));
-    // }
-    // console.log(Date.now() - s2);
-    return getSumDistances(houses[left]);
+    return getSumDistances(result);
 }
 
 const _readline = require("readline");
