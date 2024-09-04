@@ -43,13 +43,14 @@ function linearPostman(n, a, b) {
     let groupIndex = new Uint32Array(n);
 
     const custRand = new CustomRandom(a, b);
-    // const st = Date.now();
+    const st = Date.now();
 
     let hash;
     let pntRight = 0;
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
         hash = houses[i] >>> 16;
+        // console.log("hash>>", hash, houses[i]);
         groups[hash]++;
         groupIndex[i] = hash;
     }
@@ -57,68 +58,112 @@ function linearPostman(n, a, b) {
     const medianIndex = Math.floor((n - 1) / 2);
     let sum = 0;
     let index = 0;
-    let prevSum = 0;
-    while (index < 2 ** 16 && sum < medianIndex) {
-        prevSum = sum;
+    while (index < 2 ** 16 && sum <= medianIndex) {
         sum += groups[index];
         index++;
     }
 
-    console.log(groups, groupIndex, index - 1);
+    index--;
+
+    const relativeMedian = medianIndex + groups[index] - sum;
+    const sizeSubGroup = groups[index];
+    const relativeHouses = new Uint32Array(sizeSubGroup);
+
+    let subIndex = 0;
+    for (let i = 0; i < n; i++) {
+        if (groupIndex[i] === index) {
+            relativeHouses[subIndex] = houses[i];
+            subIndex++;
+        }
+    }
 
     const getSumDistances = (y) => {
         let sum = 0n;
-        y = BigInt(y);
-        for (let i = 0; i < n; i++) {
-            sum += y > BigInt(houses[i]) ? y - BigInt(houses[i]) : BigInt(houses[i]) - y;
-        }
-        return sum.toString();
-    };
-    let result;
-
-    const FindMedian = (l, r, bit) => {
-        if (l == r - 1 && l === medianIndex) {
-            result = houses[l];
-            return;
-        }
-        const mask = 1 << bit;
-
-        pntRight = l;
-        for (let i = l; i < r; i++) {
-            if ((houses[i] & mask) === 0) {
-                if (pntRight !== i) {
-                    value = houses[pntRight];
-                    houses[pntRight] = houses[i];
-                    houses[i] = value;
-                }
-                pntRight++;
+        let count = n >>> 21;
+        let range = 2 ** 21;
+        let nextRange;
+        let sumImmediate;
+        for (let b = 0; b < count; b++) {
+            sumImmediate = 0;
+            nextRange = (b + 1) * range;
+            for (let i = b * range; i < nextRange; i++) {
+                sumImmediate += y > houses[i] ? y - houses[i] : houses[i] - y;
             }
+            sum += BigInt(sumImmediate);
         }
 
-        if (bit === 0) {
-            result = houses[l];
-
-            return;
+        sumImmediate = 0;
+        for (let i = count * range; i < n; i++) {
+            sumImmediate += y > houses[i] ? y - houses[i] : houses[i] - y;
         }
+        sum += BigInt(sumImmediate);
 
-        if (medianIndex >= pntRight) {
-            FindMedian(pntRight, r, bit - 1);
-        } else {
-            FindMedian(l, pntRight, bit - 1);
-        }
+        return sum;
     };
+    // let result;
 
-    FindMedian(0, n, 31);
+    // const FindMedian = (l, r, bit) => {
+    //     if (l == r - 1 && l === relativeMedian) {
+    //         result = relativeHouses[l];
+    //         // console.log(l, relativeHouses[l], relativeHouses.length);
 
-    // console.log(pntRight, houses);
+    //         return;
+    //     }
+    //     const mask = 1 << bit;
 
-    return getSumDistances(result);
+    //     pntRight = l;
+    //     for (let i = l; i < r; i++) {
+    //         if ((relativeHouses[i] & mask) === 0) {
+    //             if (pntRight !== i) {
+    //                 value = relativeHouses[pntRight];
+    //                 relativeHouses[pntRight] = relativeHouses[i];
+    //                 relativeHouses[i] = value;
+    //             }
+    //             pntRight++;
+    //         }
+    //     }
+
+    //     if (bit === 0) {
+    //         result = relativeHouses[l];
+    //         // console.log(l, relativeHouses[l], relativeHouses.length);
+    //         return;
+    //     }
+
+    //     if (relativeMedian >= pntRight) {
+    //         FindMedian(pntRight, r, bit - 1);
+    //     } else {
+    //         FindMedian(l, pntRight, bit - 1);
+    //     }
+    // };
+
+    // FindMedian(0, sizeSubGroup, 15);
+    delete groups;
+    delete groupIndex;
+
+    relativeHouses.sort();
+    let median = relativeHouses[relativeMedian];
+    // if (n % 2 === 0) {
+    //     median += relativeHouses[relativeMedian + 1];
+    //     median = Math.floor(median / 2);
+    // }
+
+    let awe = getSumDistances(median);
+
+    let min = 2n ** 63n - 1n;
+    let z;
+    for (let i = 0; i < n; i++) {
+        z = getSumDistances(houses[i]);
+        min = min > z ? z : min;
+    }
+    console.log(min);
+
+    return awe.toString();
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
