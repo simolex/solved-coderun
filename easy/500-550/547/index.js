@@ -46,7 +46,6 @@ function linearPostman(n, a, b) {
     const st = Date.now();
 
     let hash;
-    let pntRight = 0;
     for (let i = 0; i < n; i++) {
         houses[i] = custRand.nextRand32();
         hash = houses[i] >>> 16;
@@ -79,8 +78,8 @@ function linearPostman(n, a, b) {
 
     const getSumDistances = (y) => {
         let sum = 0n;
-        let count = n >>> 21;
-        let range = 2 ** 21;
+        let count = n >>> 20;
+        let range = 2 ** 20;
         let nextRange;
         let sumImmediate;
         for (let b = 0; b < count; b++) {
@@ -142,28 +141,16 @@ function linearPostman(n, a, b) {
 
     relativeHouses.sort();
     let median = relativeHouses[relativeMedian];
-    // if (n % 2 === 0) {
-    //     median += relativeHouses[relativeMedian + 1];
-    //     median = Math.floor(median / 2);
-    // }
 
-    let awe = getSumDistances(median);
+    let result = getSumDistances(median);
 
-    let min = 2n ** 63n - 1n;
-    let z;
-    for (let i = 0; i < n; i++) {
-        z = getSumDistances(houses[i]);
-        min = min > z ? z : min;
-    }
-    console.log(min);
-
-    return awe.toString();
+    return result.toString();
 }
 
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
