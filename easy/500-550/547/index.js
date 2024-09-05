@@ -99,47 +99,67 @@ function linearPostman(n, a, b) {
 
         return sum;
     };
-    // let result;
 
-    // const FindMedian = (l, r, bit) => {
-    //     if (l == r - 1 && l === relativeMedian) {
-    //         result = relativeHouses[l];
-    //         // console.log(l, relativeHouses[l], relativeHouses.length);
-
-    //         return;
-    //     }
-    //     const mask = 1 << bit;
-
-    //     pntRight = l;
-    //     for (let i = l; i < r; i++) {
-    //         if ((relativeHouses[i] & mask) === 0) {
-    //             if (pntRight !== i) {
-    //                 value = relativeHouses[pntRight];
-    //                 relativeHouses[pntRight] = relativeHouses[i];
-    //                 relativeHouses[i] = value;
-    //             }
-    //             pntRight++;
-    //         }
-    //     }
-
-    //     if (bit === 0) {
-    //         result = relativeHouses[l];
-    //         // console.log(l, relativeHouses[l], relativeHouses.length);
-    //         return;
-    //     }
-
-    //     if (relativeMedian >= pntRight) {
-    //         FindMedian(pntRight, r, bit - 1);
-    //     } else {
-    //         FindMedian(l, pntRight, bit - 1);
-    //     }
-    // };
-
-    // FindMedian(0, sizeSubGroup, 15);
     delete groups;
     delete groupIndex;
 
-    relativeHouses.sort();
+    function partition(a, l, r, x) {
+        let equalPointer = l;
+        let greatePointer = l;
+        let newValue;
+        for (let i = l; i < r; i++) {
+            newValue = a[i];
+            switch (true) {
+                case a[i] < x:
+                    if (i !== greatePointer) {
+                        a[i] = a[greatePointer];
+                    }
+                    if (greatePointer !== equalPointer) {
+                        a[greatePointer] = a[equalPointer];
+                    }
+                    if (equalPointer !== i) {
+                        a[equalPointer] = newValue;
+                    }
+                    greatePointer++;
+                    equalPointer++;
+                    break;
+                case a[i] === x:
+                    if (i !== greatePointer) {
+                        a[i] = a[greatePointer];
+                        a[greatePointer] = newValue;
+                    }
+                    greatePointer++;
+                    break;
+                // case a[i] > x:
+                // break;
+            }
+        }
+        if (l < equalPointer) {
+            partition(
+                a,
+                l,
+                equalPointer,
+                a[l + Math.floor(Math.random() * (equalPointer - l - 1))]
+            );
+        }
+
+        if (greatePointer + 1 < r) {
+            partition(
+                a,
+                greatePointer,
+                r,
+                a[greatePointer + Math.floor(Math.random() * (r - greatePointer - 1))]
+            );
+        }
+        return a;
+    }
+
+    const sorting = (arr) => {
+        const len = arr.length;
+        return partition(arr, 0, len, a[Math.floor(Math.random() * len)]);
+    };
+
+    sorting(relativeHouses);
     let median = relativeHouses[relativeMedian];
 
     let result = getSumDistances(median);
