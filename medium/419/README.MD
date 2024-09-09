@@ -1,4 +1,4 @@
-# Классы подобия треугольников
+# Разрушить казарму
 
 [<kbd>math</kbd>](https://coderun.yandex.ru/catalog?tag=math)
 [<kbd>Coderun</kbd>](https://coderun.yandex.ru/problem/triangle-similarity)
