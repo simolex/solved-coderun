@@ -6,9 +6,14 @@ class CustomRandom {
     #buffer;
     constructor(a, b) {
         this.#buffer = new Uint32Array(6);
-        this.#buffer[0] = 0;
+        // this.#buffer[0] = 0;
         this.#buffer[1] = a;
         this.#buffer[2] = b;
+        this.reset();
+    }
+
+    reset() {
+        this.#buffer[0] = 0;
     }
 
     #nextRand24() {
@@ -22,7 +27,7 @@ class CustomRandom {
         this.#buffer[5] = this.#nextRand24();
         this.#buffer[3] = (this.#buffer[4] << 8) ^ this.#buffer[5];
 
-        return this.#buffer[3] & 0xffffffff;
+        return this.#buffer[3] >>> 0;
     }
 }
 
@@ -40,38 +45,39 @@ function linearPostman(n, a, b) {
     let houses = new Uint32Array(n);
     let groups = new Uint32Array(2 ** 16);
 
-    let groupIndex = new Uint32Array(n);
+    // let groupIndex = new Uint32Array(n);
 
     const custRand = new CustomRandom(a, b);
-    const st = Date.now();
 
     let hash;
     for (let i = 0; i < n; i++) {
-        houses[i] = custRand.nextRand32();
+        houses[i] = custRand.nextRand32() >>> 0;
         hash = houses[i] >>> 16;
-        // console.log("hash>>", hash, houses[i]);
         groups[hash]++;
-        groupIndex[i] = hash;
     }
 
-    const medianIndex = Math.floor((n - 1) / 2);
+    const medianIndex = ((n - 1) / 2) ^ 0;
     let sum = 0;
     let index = 0;
-    while (index < 2 ** 16 && sum <= medianIndex) {
-        sum += groups[index];
-        index++;
+    for (let i = 0; i < 2 ** 16; i++) {
+        if (sum + groups[i] > medianIndex) {
+            index = i;
+            break;
+        }
+        sum += groups[i];
     }
 
-    index--;
-
-    const relativeMedian = medianIndex + groups[index] - sum;
+    const relativeMedian = medianIndex - sum;
     const sizeSubGroup = groups[index];
     const relativeHouses = new Uint32Array(sizeSubGroup);
 
     let subIndex = 0;
+    custRand.reset();
+
     for (let i = 0; i < n; i++) {
-        if (groupIndex[i] === index) {
-            relativeHouses[subIndex] = houses[i];
+        hash = houses[i] >>> 16;
+        if (hash === index) {
+            relativeHouses[subIndex] = houses[i] >>> 0;
             subIndex++;
         }
     }
@@ -86,14 +92,14 @@ function linearPostman(n, a, b) {
             sumImmediate = 0;
             nextRange = (b + 1) * range;
             for (let i = b * range; i < nextRange; i++) {
-                sumImmediate += y > houses[i] ? y - houses[i] : houses[i] - y;
+                sumImmediate += y > houses[i] ? (y - houses[i]) >>> 0 : (houses[i] - y) >>> 0;
             }
             sum += BigInt(sumImmediate);
         }
 
         sumImmediate = 0;
         for (let i = count * range; i < n; i++) {
-            sumImmediate += y > houses[i] ? y - houses[i] : houses[i] - y;
+            sumImmediate += y > houses[i] ? (y - houses[i]) >>> 0 : (houses[i] - y) >>> 0;
         }
         sum += BigInt(sumImmediate);
 
@@ -101,65 +107,9 @@ function linearPostman(n, a, b) {
     };
 
     delete groups;
-    delete groupIndex;
+    // delete groupIndex;
 
-    function partition(a, l, r, x) {
-        let equalPointer = l;
-        let greatePointer = l;
-        let newValue;
-        for (let i = l; i < r; i++) {
-            newValue = a[i];
-            switch (true) {
-                case a[i] < x:
-                    if (i !== greatePointer) {
-                        a[i] = a[greatePointer];
-                    }
-                    if (greatePointer !== equalPointer) {
-                        a[greatePointer] = a[equalPointer];
-                    }
-                    if (equalPointer !== i) {
-                        a[equalPointer] = newValue;
-                    }
-                    greatePointer++;
-                    equalPointer++;
-                    break;
-                case a[i] === x:
-                    if (i !== greatePointer) {
-                        a[i] = a[greatePointer];
-                        a[greatePointer] = newValue;
-                    }
-                    greatePointer++;
-                    break;
-                // case a[i] > x:
-                // break;
-            }
-        }
-        if (l < equalPointer) {
-            partition(
-                a,
-                l,
-                equalPointer,
-                a[l + Math.floor(Math.random() * (equalPointer - l - 1))]
-            );
-        }
-
-        if (greatePointer + 1 < r) {
-            partition(
-                a,
-                greatePointer,
-                r,
-                a[greatePointer + Math.floor(Math.random() * (r - greatePointer - 1))]
-            );
-        }
-        return a;
-    }
-
-    const sorting = (arr) => {
-        const len = arr.length;
-        return partition(arr, 0, len, a[Math.floor(Math.random() * len)]);
-    };
-
-    sorting(relativeHouses);
+    relativeHouses.sort();
     let median = relativeHouses[relativeMedian];
 
     let result = getSumDistances(median);
@@ -170,7 +120,7 @@ function linearPostman(n, a, b) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin,
+    input: process.stdin
 });
 
 const _inputLines = [];
