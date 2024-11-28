@@ -78,6 +78,8 @@ int main()
 
     // Находим медиану в выбранном блоке
     unsigned int median = block_numbers[median_index - current_count];
+    // cout << median << endl;
+
 
     // Шаг 5: Считаем минимальное суммарное расстояние
     unsigned long long total_distance = 0;
