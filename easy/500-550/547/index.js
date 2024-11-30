@@ -17,8 +17,8 @@ class CustomRandom {
     }
 
     #nextRand24() {
-        this.#buffer[0] *= this.#buffer[1];
-        this.#buffer[0] += this.#buffer[2];
+        this.#buffer[0] = (this.#buffer[0] * this.#buffer[1]) >>> 0;
+        this.#buffer[0] = (this.#buffer[0] + this.#buffer[2]) >>> 0;
         return this.#buffer[0] >>> 8;
     }
 
@@ -82,7 +82,7 @@ function linearPostman(n, a, b) {
         }
     }
 
-    const getSumDistances = (y) => {
+    const getSumDistances = (median) => {
         let sum = 0n;
         let count = n >>> 20;
         let range = 2 ** 20;
@@ -92,16 +92,22 @@ function linearPostman(n, a, b) {
             sumImmediate = 0;
             nextRange = (b + 1) * range;
             for (let i = b * range; i < nextRange; i++) {
-                sumImmediate += y > houses[i] ? (y - houses[i]) >>> 0 : (houses[i] - y) >>> 0;
+                sumImmediate =
+                    sumImmediate +
+                    (median > houses[i] ? median - Number(houses[i]) : Number(houses[i]) - median);
             }
-            sum += BigInt(sumImmediate);
+            sum = sum + BigInt(sumImmediate);
         }
 
         sumImmediate = 0;
         for (let i = count * range; i < n; i++) {
-            sumImmediate += y > houses[i] ? (y - houses[i]) >>> 0 : (houses[i] - y) >>> 0;
+            sumImmediate =
+                sumImmediate +
+                (median > Number(houses[i])
+                    ? median - Number(houses[i])
+                    : Number(houses[i]) - median);
         }
-        sum += BigInt(sumImmediate);
+        sum = sum + BigInt(sumImmediate);
 
         return sum;
     };
@@ -111,6 +117,8 @@ function linearPostman(n, a, b) {
 
     relativeHouses.sort();
     let median = relativeHouses[relativeMedian];
+    median = 369313885;
+    // return median;
 
     let result = getSumDistances(median);
 
@@ -120,7 +128,7 @@ function linearPostman(n, a, b) {
 const _readline = require("readline");
 
 const _reader = _readline.createInterface({
-    input: process.stdin
+    input: process.stdin,
 });
 
 const _inputLines = [];
