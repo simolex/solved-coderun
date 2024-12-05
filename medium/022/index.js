@@ -17,5 +17,5 @@
  * не пройдёт по времени.
  */
 
-const solve = require("./solve.v2");
+const solve = require("./solve.v1");
 module.exports = solve;

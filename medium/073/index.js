@@ -3,55 +3,41 @@
  */
 
 function equationSystem(a, b, c, d, e, f) {
+    // a , b , c
+    // d , e , f
     const result = [];
     const D = a * d - b * c;
     const Dx = e * d - f * b;
     const Dy = f * a - e * c;
-    const zeroFirst = a === b && a === 0 && e !== 0;
-    const zeroSecond = c === d && c === 0 && f !== 0;
-
-    const L = [];
-    const U = [];
-
-    for (let k = 0; k < 2; k++) {
-        L[k] = Array(2).fill(0);
-        U[k] = Array(2);
-    }
-    U[0][0] = a;
-    U[0][1] = b;
-    U[1][0] = c;
-    U[1][1] = d;
-
-    console.table(U);
-
-    for (let i = 0; i < 2; i++) {
-        for (let j = i; j < 2; j++) {
-            L[j][i] = U[j][i] / U[i][i];
-        }
-    }
-
-    for (let k = 1; k < 2; k++) {
-        for (let i = k - 1; i < 2; i++) {
-            for (let j = i; j < 2; j++) {
-                L[j][i] = U[j][i] / U[i][i];
-            }
-        }
-
-        for (let i = k; i < 2; i++) {
-            for (let j = k - 1; j < 2; j++) {
-                U[i][j] = U[i][j] - L[i][k - 1] * U[k - 1][j];
-            }
-        }
-    }
-
-    console.table(L);
-    console.table(U);
 
     if (D !== 0) {
         return [2, Dx / D, Dy / D];
-    } else if (D !== Dx || D !== Dy) {
-        return [5];
+    } else if (Dx !== 0 || Dy !== 0) {
+        return [0];
+    } else if (a !== 0 && b !== 0 && c !== 0 && d !== 0) {
+        const k = -a / b;
+        const B = e / b;
+        return [1, k, B];
+    } else if (a === 0 && b === 0 && c === 0 && d === 0) {
+        if (e !== 0 || f !== 0) {
+            return [0];
+        } else {
+            return [5];
+        }
+    } else if (a === 0 && c === 0) {
+        return b === 0 ? [4, f / d] : [4, e / b];
+    } else if (b === 0 && d === 0) {
+        return a === 0 ? [3, f / c] : [3, e / a];
+    } else if (c === 0 && d === 0) {
+        const k = -a / b;
+        const B = e / b;
+        return [1, k, B];
+    } else if (a === 0 && b === 0) {
+        const k = -c / d;
+        const B = f / d;
+        return [1, k, B];
     }
+    return [0];
 }
 
 const _readline = require("readline");
@@ -78,7 +64,7 @@ function solve() {
 
     const result = equationSystem(...numbers);
 
-    console.log(result.join("\n"));
+    console.log(result.join(" "));
 }
 
 function readAllString() {
